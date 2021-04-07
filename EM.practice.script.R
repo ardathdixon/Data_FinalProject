@@ -32,6 +32,7 @@ month.decomp <- stl(fish.monthly.ts, s.window = "periodic")
 
 plot(month.decomp)
 
-
+#need to ask Luana about how to deal with the 'waves' rather than months - think this may be making things funky
+#maybe just copy the wave data so it corresponds to jan and feb etc
 
 
