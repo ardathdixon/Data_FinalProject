@@ -38,9 +38,12 @@ month.decomp <- stl(fish.monthly.ts, s.window = "periodic")
 plot(month.decomp)
 
 #need to ask Luana about how to deal with the 'waves' rather than months - think this may be making things funky
+
 #maybe just copy the wave data so wave 1 corresponds to jan and feb etc
 
 #if seasonal comp continues to look funky, maybe there's just no seasonality in dataset
 #fxn in TS projects called autoplot() --> ggplot for TS. makes the plotting really smooth - autoplot(TS object)
 #helps with visualizing if the TS is running correctly
+#maybe just copy the wave data so it corresponds to jan and feb etc
+
 
