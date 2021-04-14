@@ -98,3 +98,6 @@ ggplot(fish.tidy.summary, aes(x = DATE, y = TOT_CAT_ALL)) +
 
 fish.tidy.trend <- Kendall::SeasonalMannKendall(fish.tidy.summary.ts)
 fish.tidy.trend ## shows significant change over time!! 
+
+summary(summary.ts.decomp) #summary info includes min, mean, max, etc for each component
+#also shows % for each - amount of variation explained, maybe?
