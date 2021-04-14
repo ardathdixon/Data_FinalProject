@@ -91,3 +91,10 @@ fish.tidy.summary.ts <- ts(fish.tidy.summary$TOT_CAT_ALL,
 summary.ts.decomp <- stl(fish.tidy.summary.ts, s.window = "periodic")
 
 plot(summary.ts.decomp)
+
+ggplot(fish.tidy.summary, aes(x = DATE, y = TOT_CAT_ALL)) +
+  geom_line() +
+  geom_smooth(method = "lm")
+
+fish.tidy.trend <- Kendall::SeasonalMannKendall(fish.tidy.summary.ts)
+fish.tidy.trend ## shows significant change over time!! 
