@@ -1,3 +1,6 @@
+#install.packages("ggfortify")
+#install.packages("forecast")
+#install.packages("astsa")
 library(lubridate)
 library(dplyr)
 library(tidyverse)
@@ -5,6 +8,9 @@ library(gpplot2)
 library(zoo)
 library(trend)
 library(tidyr)
+library(ggfortify)
+library(forecast)
+library(astsa)
 
 fish.dat <- readxl::read_excel("../Data_FinalProject/Data/Raw/mrip_estim_catch_wave_1990_2019_NC.xlsx")
 
@@ -76,6 +82,34 @@ fish.tidy.summary <- fish.tidy %>%
 fish.tidy.summary.ts <- ts(fish.tidy.summary$TOT_CAT_ALL, 
                            start = c(1990, 1),frequency = 6)
 summary.ts.decomp <- stl(fish.tidy.summary.ts, s.window = "periodic")
+
+#autoplot requires ggfortify along w ggplot
+autoplot(fish.tidy.summary.ts)
+
+#forecasting: use forecast fxn but have to specify a method
+#naive: uses most recent observation to forecast next one (NO)
+#exponential smoothing: extension of above, use weighted averages of past observations - more recent obs get weighted higher (NO)
+#holts trend: extension of above, considers trend component - 2 smoothing eqtns (maybe?)
+#ARIMA: v popular. tries to describe autocorrelations rather than basing on trend and seasonality (NO)
+#TBATS: combines trig terms for seasonality, heterogeneity, short-term error dynamics, trend, and seasonal components (maybe?)
+#holt winters is holts trend but w added seasonality (maybe?)
+#double season holt winters allows for seasonality on multiple scales, e.g. month and year
+#SARIMA adds seasonal component to ARIMA
+#HW:
+holtsfish <- HoltWinters(fish.tidy.summary.ts)
+fish.predict.HW <- forecast(holtsfish, h=12, findfrequency = TRUE)
+plot(fish.predict.HW)
+#^plots next 2 years^
+
+#ARIMA:
+arima.fish <- auto.arima(fish.tidy.summary.ts)
+plot(arima.fish)
+#oh no?????
+
+#SARIMA:
+#sarima.fish <- sarima(fish.tidy.summary.ts, )
+#these get super complicated with autoregressive orders and stuff so for now just look at HW one and other descriptions and let me know ur thoughts :)
+
 
 plot(summary.ts.decomp)
 
