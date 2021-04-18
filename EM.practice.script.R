@@ -12,7 +12,8 @@ library(ggfortify)
 library(forecast)
 library(astsa)
 
-fish.dat <- readxl::read_excel("../Data_FinalProject/Data/Raw/mrip_estim_catch_wave_1990_2019_NC.xlsx")
+#fish.dat <- readxl::read_excel("../Data_FinalProject/Data/Raw/mrip_estim_catch_wave_1990_2019_NC.xlsx")
+fish.dat <- read.csv("../Data_FinalProject/Data/Raw/BLUEFISH_mrip_estim_catch_wave_1990_2019_nc.csv")
 
 ##create function to choose a month for each wave
 wave_to_month_function <-  (function(WAVE) {
@@ -105,6 +106,7 @@ plot(fish.predict.HW)
 arima.fish <- auto.arima(fish.tidy.summary.ts)
 plot(arima.fish)
 #oh no?????
+#hahahaha
 
 #SARIMA:
 #sarima.fish <- sarima(fish.tidy.summary.ts, )
@@ -133,7 +135,7 @@ colnames(fish.summary.interpolate) <- c("DATE")
 fish.summary.interpolate <- left_join(fish.summary.interpolate, fish.tidy.summary)
 
 #how many dates are missing?
-sum(is.na(fish.summary.interpolate$TOT_CAT_ALL)) #only 11 NAs!
+sum(is.na(fish.summary.interpolate$TOT_CAT_ALL)) #only 11 NAs! <- OLD DATA. New data has 18 NAs
 
 #linear approximation for missing dates
 fish.summary.interpolate$TOT_CAT_ALL <- na.approx(fish.summary.interpolate$TOT_CAT_ALL)
