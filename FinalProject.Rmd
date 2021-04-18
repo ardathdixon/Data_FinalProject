@@ -1,0 +1,183 @@
+---
+title: "Data Final Project"
+author: "Ardath Dixon, Annie Harsharger, Eva May"
+date: "4/18/2021"
+output:
+  pdf_document: default
+  html_document: default
+editor_options:
+  chunk_output_type: console
+---
+
+```{r install.packages, eval=FALSE}
+install.packages("ggfortify")
+install.packages("forecast")
+install.packages("astsa")
+install.packages("tidyr")
+install.packages("trend")
+install.packages("zoo")
+install.packages("ggplot2")
+install.packages("tidyverse")
+install.packages("dplyr")
+install.packages("lubridate")
+```
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(lubridate)
+library(dplyr)
+library(tidyverse)
+library(ggplot2)
+library(zoo)
+library(trend)
+library(tidyr)
+library(ggfortify)
+library(forecast)
+library(astsa)
+
+fish.dat <- readxl::read_excel("../Data_FinalProject/Data/Raw/mrip_estim_catch_wave_1990_2019_NC.xlsx")
+
+ourtheme <- theme_light(base_size = 9)+
+    theme(axis.text = element_text(color = "black"), legend.position = "top")
+theme_set(ourtheme) ## we can certainly change these defaults -- i copy/pasted them from a prev assign
+```
+
+Create function to choose a month for each wave
+
+```{r wave to month}
+wave_to_month_function <-  (function(WAVE) {
+  if(WAVE == 1) {
+    "Jan"
+  }
+  else if(WAVE == 2) {
+    "Mar"
+  }
+  else if(WAVE == 3) {
+    "May"
+  }
+  else if(WAVE == 4) {
+    "Jul"
+  }
+  else if(WAVE == 5) {
+    "Sep"
+  }
+  else {
+    "Nov"
+  }
+})
+
+wave_to_month_function_V <- Vectorize(wave_to_month_function) #vectorize function
+```
+
+Create tidy dataset -- maybe can combine filled & summary into one chunk?
+
+```{r create tidy dataset}
+fish.tidy <- fish.dat %>%
+  select(YEAR, WAVE, MODE_FX, AREA_X, TOT_CAT) %>%
+  mutate(MONTH = wave_to_month_function_V(WAVE)) %>%
+  mutate(DATE = my(paste0(MONTH, "-", YEAR))) %>%
+  select(DATE, MONTH, YEAR, MODE_FX, AREA_X, TOT_CAT)
+
+fish.tidy.filled <- fish.tidy %>%
+  mutate(TOT_CAT =
+           na.approx(TOT_CAT))
+
+fish.tidy.summary <- fish.tidy %>%
+  select(DATE, MONTH, YEAR, TOT_CAT) %>%
+  group_by(DATE) %>%
+  summarise(TOT_CAT_ALL = sum(TOT_CAT)) #does not have NAs but does have missing observations
+#approximate these later (just testing ts again for now)
+
+#need to verify if sum of TOT_CAT is ok/why there are so many different point for each
+#possibly due to different combinations of areas, zones of fishing, etc
+```
+
+Plot line graph of total catch over time
+
+```{r}
+ggplot(fish.tidy, aes(x = DATE, y = TOT_CAT)) +
+  geom_line() +
+  geom_smooth(method = "lm")
+
+```
+
+Convert to time series dataset and plot accordingly
+
+```{r create time series dataset}
+fmonth <- month(first(fish.tidy.filled$DATE))
+fyear <- year(first(fish.tidy.filled$DATE))
+
+## with tidy.filled dataset -- maybe we can delete this whole chunk?
+fish.monthly.ts <- ts(fish.tidy.filled$TOT_CAT, 
+                             start = c(fyear, fmonth),frequency = 6)
+month.decomp <- stl(fish.monthly.ts, s.window = "periodic")
+plot(month.decomp)
+```
+
+The display above shows a solid chunk for 'seasonal,' so the code below summarizes the data before plotting again.
+
+```{r create time series summary dataset}
+fmonth <- month(first(fish.tidy.filled$DATE)) #copied down here too in case we delete the prev chunk
+fyear <- year(first(fish.tidy.filled$DATE))
+
+fish.tidy.summary.ts <- ts(fish.tidy.summary$TOT_CAT_ALL, 
+                           start = c(fyear, fmonth),frequency = 6)
+summary.ts.decomp <- stl(fish.tidy.summary.ts, s.window = "periodic")
+plot(summary.ts.decomp)
+```
+
+Time Series projects has a function called autoplot(), which functions as ggplot for Time Series. This makes the plotting smoother, and helps with visualizations if TS is running correctly. It requires ggfortify and ggplot. autoplot(TS object)
+
+```{r autoplot}
+autoplot(fish.tidy.summary.ts)
+## this does look the same as the ggplot() made in the next chunk. does it have features that make it better / that we should include?
+```
+
+
+```{r}
+ggplot(fish.tidy.summary, aes(x = DATE, y = TOT_CAT_ALL)) +
+  geom_line() +
+  geom_smooth(method = "lm")
+
+fish.tidy.trend <- Kendall::SeasonalMannKendall(fish.tidy.summary.ts)
+fish.tidy.trend ## shows significant change over time!! 
+
+summary(summary.ts.decomp) #summary info includes min, mean, max, etc for each component
+#also shows % for each - amount of variation explained, maybe?
+```
+
+Forecasting Analysis
+
+forecasting: use forecast fxn but have to specify a method
+naive: uses most recent observation to forecast next one (NO)
+exponential smoothing: extension of above, use weighted averages of past observations - more recent obs get weighted higher (NO)
+holts trend: extension of above, considers trend component - 2 smoothing eqtns (maybe?)
+ARIMA: v popular. tries to describe autocorrelations rather than basing on trend and seasonality (NO)
+TBATS: combines trig terms for seasonality, heterogeneity, short-term error dynamics, trend, and seasonal components (maybe?)
+holt winters is holts trend but w added seasonality (maybe?)
+double season holt winters allows for seasonality on multiple scales, e.g. month and year
+SARIMA adds seasonal component to ARIMA
+
+```{r HW}
+holtsfish <- HoltWinters(fish.tidy.summary.ts)
+fish.predict.HW <- forecast(holtsfish, h=12, findfrequency = TRUE)
+plot(fish.predict.HW)
+#^plots next 2 years^
+
+## cool!
+```
+
+```{r ARIMA}
+arima.fish <- auto.arima(fish.tidy.summary.ts)
+plot(arima.fish)
+#oh no?????
+
+## what does this mean? looks like it could be super complicated statistics..
+```
+
+```{r SARIMA}
+#sarima.fish <- sarima(fish.tidy.summary.ts, )
+#these get super complicated with autoregressive orders and stuff so for now just look at HW one and other descriptions and let me know ur thoughts :)
+```
