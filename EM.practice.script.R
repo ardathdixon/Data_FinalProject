@@ -4,7 +4,7 @@
 library(lubridate)
 library(dplyr)
 library(tidyverse)
-library(gpplot2)
+library(ggplot2)
 library(zoo)
 library(trend)
 library(tidyr)
