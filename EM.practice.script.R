@@ -1,6 +1,6 @@
-#install.packages("ggfortify")
-#install.packages("forecast")
-#install.packages("astsa")
+# install.packages("ggfortify")
+# install.packages("forecast")
+# install.packages("astsa")
 library(lubridate)
 library(dplyr)
 library(tidyverse)
@@ -117,9 +117,30 @@ ggplot(fish.tidy.summary, aes(x = DATE, y = TOT_CAT_ALL)) +
   geom_line() +
   geom_smooth(method = "lm")
 
-fish.tidy.trend <- Kendall::SeasonalMannKendall(fish.tidy.summary.ts)
+fish.tidy.trend <- Kendall::SeasonalMannKendall(fish.tidy.summary.ts) #SMK test before interpolation
 fish.tidy.trend ## shows significant change over time!! 
 
 summary(summary.ts.decomp) #summary info includes min, mean, max, etc for each component
 #also shows % for each - amount of variation explained, maybe?
+
+#interpolation
+#set up complete date sequence
+fish.summary.interpolate <- as.data.frame(
+  seq.Date(from = as.Date("1990-01-01"), to = as.Date("2019-11-01"), by = "2 months"))
+colnames(fish.summary.interpolate) <- c("DATE")
+
+#join data to complete date sequence
+fish.summary.interpolate <- left_join(fish.summary.interpolate, fish.tidy.summary)
+
+#how many dates are missing?
+sum(is.na(fish.summary.interpolate$TOT_CAT_ALL)) #only 11 NAs!
+
+#linear approximation for missing dates
+fish.summary.interpolate$TOT_CAT_ALL <- na.approx(fish.summary.interpolate$TOT_CAT_ALL)
+
+#rerun Seasonal Mann-Kendall test on interpolated data
+fish.interpolated.ts <- ts(fish.summary.interpolate$TOT_CAT_ALL, 
+                      start = c(1990, 1),frequency = 6)
+fish.interpolated.trend <- Kendall::SeasonalMannKendall(fish.interpolated.ts) #SMK test after interpolation
+fish.interpolated.trend ## also shows significant change over time!
 
