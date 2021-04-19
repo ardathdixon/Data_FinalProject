@@ -99,7 +99,10 @@ Plot line graph of total catch over time
 ```{r}
 ggplot(fish.tidy, aes(x = DATE, y = TOT_CAT)) +
   geom_line() +
-  geom_smooth(method = "lm")
+  geom_smooth(method = "lm")+
+  labs(x="Date", y="Total Catch")+
+  scale_x_date(date_breaks = "2 year", date_labels = "%Y")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 ```
 
@@ -138,14 +141,22 @@ autoplot(fish.tidy.summary.ts)
 
 ```{r}
 ggplot(fish.tidy.summary, aes(x = DATE, y = TOT_CAT_ALL)) +
-  geom_line() +
-  geom_smooth(method = "lm")
+  geom_line()+
+  geom_smooth(method = "lm", se = FALSE)+ ## se = FALSE removes the stdev buffer
+  labs(x = "Date", y = "Total Catch")+
+  scale_x_date(date_breaks = "2 year", date_labels = "%Y")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
+```
+
+```{r}
 fish.tidy.trend <- Kendall::SeasonalMannKendall(fish.tidy.summary.ts)
-fish.tidy.trend ## shows significant change over time!! 
+fish.tidy.trend
 
-summary(summary.ts.decomp) #summary info includes min, mean, max, etc for each component
+ts_summary <- summary(summary.ts.decomp) #summary info includes min, mean, max, etc for each component
 #also shows % for each - amount of variation explained, maybe?
+
+## maybe could create a dataframe & make a table out of this?
 ```
 
 Forecasting Analysis
@@ -163,7 +174,9 @@ SARIMA adds seasonal component to ARIMA
 ```{r HW}
 holtsfish <- HoltWinters(fish.tidy.summary.ts)
 fish.predict.HW <- forecast(holtsfish, h=12, findfrequency = TRUE)
-plot(fish.predict.HW)
+plot(fish.predict.HW,
+    xlab= "Date", ylab = "Total Catch", main = "Holt Winters Total Catch Forecasts")
+
 #^plots next 2 years^
 
 ## cool!
