@@ -1,7 +1,7 @@
 ---
 title: "Data Final Project"
-author: "Ardath Dixon, Annie Harsharger, Eva May"
-date: "4/18/2021"
+author: "Ardath Dixon, Annie Harshbarger, Eva May"
+date: "April 2021"
 output:
   pdf_document: default
   html_document: default
