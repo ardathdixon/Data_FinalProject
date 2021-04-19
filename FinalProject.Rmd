@@ -190,7 +190,3 @@ plot(arima.fish)
 ## what does this mean? looks like it could be super complicated statistics..
 ```
 
-```{r SARIMA}
-#sarima.fish <- sarima(fish.tidy.summary.ts, )
-#these get super complicated with autoregressive orders and stuff so for now just look at HW one and other descriptions and let me know ur thoughts :)
-```
