@@ -1,8 +1,10 @@
-Trends in Recreational Fishing in North Carolina (1990-2019)
+Recreational Fishing Trends in North Carolina (1990-2019)
 ========================================================
 author: Ardath Dixon, Annie Harshbarger, Eva May
 date: Spring 2021
 autosize: true
+
+<img src="./BlackSeaBass.jpg" title="plot of chunk title page" alt="plot of chunk title page" width="45%" style="display: block; margin: auto 0 auto auto;" />
 
 First Slide
 ========================================================
@@ -46,17 +48,17 @@ Total Catch 1990-2019
 Time Series Trends - All Fish
 ========================================================
 
-<img src="FinalPresentation-figure/unnamed-chunk-4-1.png" title="plot of chunk unnamed-chunk-4" alt="plot of chunk unnamed-chunk-4" style="display: block; margin: auto;" />
+![plot of chunk unnamed-chunk-4](FinalPresentation-figure/unnamed-chunk-4-1.png)
 
 Time Series Trends - Bluefish
 ========================================================
 
-<img src="FinalPresentation-figure/unnamed-chunk-5-1.png" title="plot of chunk unnamed-chunk-5" alt="plot of chunk unnamed-chunk-5" style="display: block; margin: auto;" />
+![plot of chunk unnamed-chunk-5](FinalPresentation-figure/unnamed-chunk-5-1.png)
 
 Time Series Trends - Black Sea Bass
 ========================================================
 
-<img src="FinalPresentation-figure/unnamed-chunk-6-1.png" title="plot of chunk unnamed-chunk-6" alt="plot of chunk unnamed-chunk-6" style="display: block; margin: auto;" />
+![plot of chunk unnamed-chunk-6](FinalPresentation-figure/unnamed-chunk-6-1.png)
 
 Slide with Statistics
 ========================================================

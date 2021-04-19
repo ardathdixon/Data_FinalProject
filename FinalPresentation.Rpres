@@ -1,8 +1,14 @@
-Trends in Recreational Fishing in North Carolina (1990-2019)
+Recreational Fishing Trends in North Carolina (1990-2019)
 ========================================================
 author: Ardath Dixon, Annie Harshbarger, Eva May
 date: Spring 2021
 autosize: true
+
+```{r title page, echo = FALSE, fig.align = 'right', out.width = "45%"}
+include_graphics('./BlackSeaBass.jpg') 
+
+## found this online at https://www.carolinasportsman.com/fishing/offshore-fishing/black-sea-bass/black-sea-bass-give-little-river-a-great-bottomfish-option/
+```
 
 First Slide
 ========================================================
@@ -35,7 +41,7 @@ blue.dat <- read.csv("../Data_FinalProject/Data/Raw/BLUEFISH_mrip_estim_catch_wa
 bass.dat <- read.csv("../Data_FinalProject/Data/Raw/BSB_mrip_estim_catch_wave_1990_2019_nc.csv")
 
 
-ourtheme <- theme_light(base_size = 12)+
+ourtheme <- theme_light(base_size = 14)+
     theme(axis.text = element_text(color = "black"), legend.position = "top")
 theme_set(ourtheme)
 
@@ -132,7 +138,7 @@ Total Catch 1990-2019
 ========================================================
 
 
-```{r ggplot, echo=FALSE, fig.width = 20, fig.height = 10}
+```{r ggplot, echo=FALSE, fig.height = 8, fig.width = 12}
 fish_ggplot <- ggplot(fish.summary.interpolate, aes(x = DATE, y = TOT_CAT_ALL)) +
   geom_line() +
   geom_smooth(method = "lm")+
@@ -160,7 +166,7 @@ plot_grid(fish_ggplot, blue_ggplot, bass_ggplot, nrow = 3)
 Time Series Trends - All Fish
 ========================================================
 
-```{r, echo=FALSE, fig.align = "center"}
+```{r, echo=FALSE, fig.width = 10, fig.height = 8}
 fish.fmonth <- month(first(fish.summary.interpolate$DATE))
 fish.fyear <- year(first(fish.summary.interpolate$DATE))
 
@@ -174,7 +180,7 @@ plot(fish.summary.ts.decomp)
 Time Series Trends - Bluefish
 ========================================================
 
-```{r, echo=FALSE, fig.align = "center"}
+```{r, echo=FALSE, fig.width = 10, fig.height = 8}
 blue.fmonth <- month(first(blue.summary.interpolate$DATE))
 blue.fyear <- year(first(blue.summary.interpolate$DATE))
 
@@ -188,7 +194,7 @@ plot(blue.summary.ts.decomp)
 Time Series Trends - Black Sea Bass
 ========================================================
 
-```{r, echo=FALSE, fig.align = "center"}
+```{r, echo=FALSE, fig.width = 10, fig.height = 8}
 bass.fmonth <- month(first(bass.summary.interpolate$DATE))
 bass.fyear <- year(first(bass.summary.interpolate$DATE))
 
@@ -211,12 +217,14 @@ fish.trend
 Forecasting
 ========================================================
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, fig.height = 8, fig.width = 12}
 holtsfish <- HoltWinters(fish.summary.interpolate.ts)
 fish.predict.HW <- forecast(holtsfish, h=30, findfrequency = TRUE)
-plot(fish.predict.HW,
+fish.predict.plot <- plot(fish.predict.HW,
     xlab= "Date", ylab = "Total Catch", main = "Holt Winters Total Catch Forecasts")
-## cowplot with time series predictions for 5 years
+
+#plot_grid(fish.predict.plot, blue.predict.plot, bass.predict.plot, nrow = 3)
+## or whatever names you choose
 ```
 
 Discussion
