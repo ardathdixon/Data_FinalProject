@@ -12,8 +12,8 @@ library(ggfortify)
 library(forecast)
 library(astsa)
 
-#fish.dat <- readxl::read_excel("../Data_FinalProject/Data/Raw/mrip_estim_catch_wave_1990_2019_NC.xlsx")
-fish.dat <- read.csv("../Data_FinalProject/Data/Raw/BLUEFISH_mrip_estim_catch_wave_1990_2019_nc.csv")
+#blue.dat <- readxl::read_excel("../Data_FinalProject/Data/Raw/mrip_estim_catch_wave_1990_2019_NC.xlsx")
+blue.dat <- read.csv("../Data_FinalProject/Data/Raw/BLUEFISH_mrip_estim_catch_wave_1990_2019_nc.csv")
 
 ##create function to choose a month for each wave
 wave_to_month_function <-  (function(WAVE) {
@@ -41,29 +41,29 @@ wave_to_month_function <-  (function(WAVE) {
 wave_to_month_function_V <- Vectorize(wave_to_month_function)
 
 #create tidy dataset
-fish.tidy <- fish.dat %>%
+blue.tidy <- blue.dat %>%
   select(YEAR, WAVE, MODE_FX, AREA_X, TOT_CAT) %>%
   mutate(MONTH = wave_to_month_function_V(WAVE)) %>%
   mutate(DATE = my(paste0(MONTH, "-", YEAR))) %>%
   select(DATE, MONTH, YEAR, MODE_FX, AREA_X, TOT_CAT)
 
 
-ggplot(fish.tidy, aes(x = DATE, y = TOT_CAT)) +
+ggplot(blue.tidy, aes(x = DATE, y = TOT_CAT)) +
   geom_line() +
   geom_smooth(method = "lm")
 
-fish.tidy.filled <- fish.tidy %>%
+blue.tidy.filled <- blue.tidy %>%
   mutate(TOT_CAT =
            na.approx(TOT_CAT))
 
 
-fmonth <- month(first(fish.tidy.filled$DATE))
-fyear <- year(first(fish.tidy.filled$DATE))
+fmonth <- month(first(blue.tidy.filled$DATE))
+fyear <- year(first(blue.tidy.filled$DATE))
 
-fish.monthly.ts <- ts(fish.tidy.filled$TOT_CAT, 
+blue.monthly.ts <- ts(blue.tidy.filled$TOT_CAT, 
                              start = c(1990, 1),frequency = 6)
 
-month.decomp <- stl(fish.monthly.ts, s.window = "periodic")
+month.decomp <- stl(blue.monthly.ts, s.window = "periodic")
 
 plot(month.decomp)
 
@@ -73,19 +73,19 @@ plot(month.decomp)
 
 #need to verify if sum of TOT_CAT is ok/why there are so many different point for each
 #possibly due to different combinations of areas, zones of fishing, etc
-fish.tidy.summary <- fish.tidy %>%
+blue.tidy.summary <- blue.tidy %>%
   select(DATE, MONTH, YEAR, TOT_CAT) %>%
   group_by(DATE) %>%
   summarise(TOT_CAT_ALL = sum(TOT_CAT))
   
 #does not have NAs but does have missing observations
 #approximate these later (just testing ts again for now)
-fish.tidy.summary.ts <- ts(fish.tidy.summary$TOT_CAT_ALL, 
+blue.tidy.summary.ts <- ts(blue.tidy.summary$TOT_CAT_ALL, 
                            start = c(1990, 1),frequency = 6)
-summary.ts.decomp <- stl(fish.tidy.summary.ts, s.window = "periodic")
+summary.ts.decomp <- stl(blue.tidy.summary.ts, s.window = "periodic")
 
 #autoplot requires ggfortify along w ggplot
-autoplot(fish.tidy.summary.ts)
+autoplot(blue.tidy.summary.ts)
 
 #forecasting: use forecast fxn but have to specify a method
 #naive: uses most recent observation to forecast next one (NO)
@@ -97,52 +97,52 @@ autoplot(fish.tidy.summary.ts)
 #double season holt winters allows for seasonality on multiple scales, e.g. month and year
 #SARIMA adds seasonal component to ARIMA
 #HW:
-holtsfish <- HoltWinters(fish.tidy.summary.ts)
-fish.predict.HW <- forecast(holtsfish, h=12, findfrequency = TRUE)
-plot(fish.predict.HW)
+holtsblue <- HoltWinters(blue.tidy.summary.ts)
+blue.predict.HW <- forecast(holtsblue, h=12, findfrequency = TRUE)
+plot(blue.predict.HW)
 #^plots next 2 years^
 
 #ARIMA:
-arima.fish <- auto.arima(fish.tidy.summary.ts)
-plot(arima.fish)
+arima.blue <- auto.arima(blue.tidy.summary.ts)
+plot(arima.blue)
 #oh no?????
 #hahahaha
 
 #SARIMA:
-#sarima.fish <- sarima(fish.tidy.summary.ts, )
+#sarima.blue <- sarima(blue.tidy.summary.ts, )
 #these get super complicated with autoregressive orders and stuff so for now just look at HW one and other descriptions and let me know ur thoughts :)
 
 
 plot(summary.ts.decomp)
 
-ggplot(fish.tidy.summary, aes(x = DATE, y = TOT_CAT_ALL)) +
+ggplot(blue.tidy.summary, aes(x = DATE, y = TOT_CAT_ALL)) +
   geom_line() +
   geom_smooth(method = "lm")
 
-fish.tidy.trend <- Kendall::SeasonalMannKendall(fish.tidy.summary.ts) #SMK test before interpolation
-fish.tidy.trend ## shows significant change over time!! 
+blue.tidy.trend <- Kendall::SeasonalMannKendall(blue.tidy.summary.ts) #SMK test before interpolation
+blue.tidy.trend ## shows significant change over time!! 
 
 summary(summary.ts.decomp) #summary info includes min, mean, max, etc for each component
 #also shows % for each - amount of variation explained, maybe?
 
 #interpolation
 #set up complete date sequence
-fish.summary.interpolate <- as.data.frame(
+blue.summary.interpolate <- as.data.frame(
   seq.Date(from = as.Date("1990-01-01"), to = as.Date("2019-11-01"), by = "2 months"))
-colnames(fish.summary.interpolate) <- c("DATE")
+colnames(blue.summary.interpolate) <- c("DATE")
 
 #join data to complete date sequence
-fish.summary.interpolate <- left_join(fish.summary.interpolate, fish.tidy.summary)
+blue.summary.interpolate <- left_join(blue.summary.interpolate, blue.tidy.summary)
 
 #how many dates are missing?
-sum(is.na(fish.summary.interpolate$TOT_CAT_ALL)) #only 11 NAs! <- OLD DATA. New data has 18 NAs
+sum(is.na(blue.summary.interpolate$TOT_CAT_ALL)) #only 11 NAs! <- OLD DATA. New data has 18 NAs
 
 #linear approximation for missing dates
-fish.summary.interpolate$TOT_CAT_ALL <- na.approx(fish.summary.interpolate$TOT_CAT_ALL)
+blue.summary.interpolate$TOT_CAT_ALL <- na.approx(blue.summary.interpolate$TOT_CAT_ALL)
 
 #rerun Seasonal Mann-Kendall test on interpolated data
-fish.interpolated.ts <- ts(fish.summary.interpolate$TOT_CAT_ALL, 
+blue.interpolated.ts <- ts(blue.summary.interpolate$TOT_CAT_ALL, 
                       start = c(1990, 1),frequency = 6)
-fish.interpolated.trend <- Kendall::SeasonalMannKendall(fish.interpolated.ts) #SMK test after interpolation
-fish.interpolated.trend ## also shows significant change over time!
+blue.interpolated.trend <- Kendall::SeasonalMannKendall(blue.interpolated.ts) #SMK test after interpolation
+blue.interpolated.trend ## also shows significant change over time!
 
