@@ -1,0 +1,113 @@
+---
+output: 
+  pdf_document:
+    keep_tex: yes
+    fig_caption: yes
+    number_sections: yes
+geometry: margin=2.54cm
+title: "Recreational Fishing Trends in North Carolina (1990-2019)"
+subtitle: "https://github.com/ardathdixon/Data_FinalProject"
+author: "Ardath Dixon, Annie Harshbarger, Eva May"
+date: "Spring 2021"
+fontsize: 12pt
+mainfont: Times New Roman
+
+---
+
+\newpage
+\tableofcontents 
+\newpage
+\listoftables 
+\newpage
+\listoffigures 
+\newpage
+
+```{r setup, include=FALSE}
+# Set your working directory
+getwd()
+
+# Load your packages
+knitr::opts_chunk$set(echo = TRUE)
+
+library(lubridate)
+library(dplyr)
+library(tidyverse)
+library(ggplot2)
+library(zoo)
+library(trend)
+library(tidyr)
+library(forecast)
+library(astsa)
+library(cowplot)
+
+# Set your ggplot theme
+ourtheme <- theme_light(base_size = 9)+
+    theme(axis.text = element_text(color = "black"), legend.position = "top")
+theme_set(ourtheme)
+
+# Load your datasets
+fish.dat <- readxl::read_excel("../Data_FinalProject/Data/Raw/mrip_estim_catch_wave_1990_2019_NC.xlsx")
+```
+
+# Rationale and Research Questions
+
+
+
+\newpage
+
+# Dataset Information
+
+
+
+\newpage
+
+# Exploratory Analysis 
+
+```{r wave to month, include=FALSE}
+wave_to_month_function <-  (function(WAVE) {
+  if(WAVE == 1) {
+    "Jan"
+  }
+  else if(WAVE == 2) {
+    "Mar"
+  }
+  else if(WAVE == 3) {
+    "May"
+  }
+  else if(WAVE == 4) {
+    "Jul"
+  }
+  else if(WAVE == 5) {
+    "Sep"
+  }
+  else {
+    "Nov"
+  }
+})
+wave_to_month_function_V <- Vectorize(wave_to_month_function) #vectorize function
+```
+
+
+
+\newpage
+
+# Analysis
+
+
+
+## Question 1: <insert specific question here and add additional subsections for additional questions below, if needed>
+
+## Question 2: 
+
+
+
+
+\newpage
+
+# Summary and Conclusions
+
+
+\newpage
+
+# References
+<add references here if relevant, otherwise delete this section> 
