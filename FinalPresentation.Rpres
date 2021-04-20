@@ -1,4 +1,4 @@
-Recreational Fishing Trends in North Carolina (1990-2019)
+What's the Catch? Recreational Fishing Trends in North Carolina (1990-2019)
 ========================================================
 author: Ardath Dixon, Annie Harshbarger, Eva May
 date: Spring 2021
@@ -10,16 +10,28 @@ include_graphics('./BlackSeaBass.jpg')
 ## found this online at https://www.carolinasportsman.com/fishing/offshore-fishing/black-sea-bass/black-sea-bass-give-little-river-a-great-bottomfish-option/
 ```
 
-First Slide
+Data and Research Questions
 ========================================================
 
-Overall description
 
-- What the data is
-- Where we got it
-- What we hope to show
+Data retrieved from NOAA Marine Recreational Information Program download query tool
 
-Slide With Code
+- Recreational fisheries catch totals for North Carolina, 1990-2019
+
+- All species, bluefish (*Pomatomus saltatrix*), and black sea bass (*Centropristis striata*) 
+
+- Multiple modes of fishing and areas where fishing occurred
+
+- Organized in waves (2-month periods)
+
+
+Research questions
+
+- Are there changes in the amount of these fish caught over time?
+
+- Do these trends differ for bluefish, black sea bass, and all species combined?
+
+A Preview of the Data
 ========================================================
 
 ```{r, include=FALSE}
@@ -129,10 +141,20 @@ bass.summary.interpolate$TOT_CAT_ALL <- na.approx(bass.summary.interpolate$TOT_C
 ## cowplot w the time series components
 ```
 
-```{r}
-head(fish.tidy)
+Original Dataset
+
+```{r echo = FALSE}
+head(fish.dat[,c(1:7,16)])
 
 ```
+
+Wrangled Dataset
+
+```{r echo = FALSE}
+head(fish.summary.interpolate)
+
+```
+
 
 Total Catch 1990-2019
 ========================================================
@@ -205,14 +227,36 @@ plot(bass.summary.ts.decomp)
 
 ```
 
-Slide with Statistics
+Monotonic Trend Analysis
 ========================================================
+
+Seasonal Mann-Kendall Test
+
+All species
 
 ```{r, echo=FALSE}
 fish.trend <- Kendall::SeasonalMannKendall(fish.summary.interpolate.ts)
 fish.trend
 
 ```
+
+Bluefish
+
+```{r, echo=FALSE}
+blue.trend <- Kendall::SeasonalMannKendall(blue.summary.interpolate.ts)
+blue.trend
+
+```
+
+Black sea bass
+
+```{r, echo=FALSE}
+bass.trend <- Kendall::SeasonalMannKendall(bass.summary.interpolate.ts)
+bass.trend
+
+```
+
+For both individual species and all species combined, **reject the null hypothesis that there is no trend.
 
 Forecasting
 ========================================================
