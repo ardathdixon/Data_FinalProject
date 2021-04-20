@@ -120,3 +120,8 @@ Forecasting
 Discussion
 ========================================================
 Text of why stuff happened.
+[note:just ideas/scattered thoughts below]
+forecasting: note that Holt Winters weighs more recent data more heavily than older data (e.g. bluefish total trend is postiive but forecasted trend looks negative) and predicts data without much noise in it, which is unlikely to be the case IRL. Useful visualization but inaccurate bc of complexities in fishing data. (could go above w forecasting slides)
+
+general trends: Seasonal trends look different between all species, bluefish, and seabass. Can be from different fishing seasons and fish availability throughout the year. Overall positive trend in all fish species catch is due to [how many?] different species' influence, so blue and BSB catch won't necessarily align with this. but we do see a postiive trend in each one, albeit to differing extents. Irregularities in these data can occur due to shifts in policy, e.g. recreational catch limits or changes in limits. Recreational catch data are also estimates based on surveys - they use the best available science from NOAA but ultimately cannot 100% accurately reflect actual catch numbers, which would require accurate self reporting from every rec fisher in NC. 
+
