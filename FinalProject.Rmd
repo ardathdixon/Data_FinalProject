@@ -10,7 +10,6 @@ editor_options:
 ---
 
 ```{r install.packages, eval=FALSE}
-install.packages("ggfortify")
 install.packages("forecast")
 install.packages("astsa")
 install.packages("tidyr")
@@ -20,6 +19,7 @@ install.packages("ggplot2")
 install.packages("tidyverse")
 install.packages("dplyr")
 install.packages("lubridate")
+install.packages("cowplot")
 ```
 
 
@@ -33,15 +33,21 @@ library(ggplot2)
 library(zoo)
 library(trend)
 library(tidyr)
-library(ggfortify)
 library(forecast)
 library(astsa)
+library(cowplot)
 
 fish.dat <- readxl::read_excel("../Data_FinalProject/Data/Raw/mrip_estim_catch_wave_1990_2019_NC.xlsx")
+blue.dat <- read.csv("../Data_FinalProject/Data/Raw/BLUEFISH_mrip_estim_catch_wave_1990_2019_nc.csv")
+bass.dat <- read.csv("../Data_FinalProject/Data/Raw/BSB_mrip_estim_catch_wave_1990_2019_nc.csv")
 
 ourtheme <- theme_light(base_size = 9)+
     theme(axis.text = element_text(color = "black"), legend.position = "top")
-theme_set(ourtheme) ## we can certainly change these defaults -- i copy/pasted them from a prev assign
+theme_set(ourtheme)
+```
+
+```{r}
+## insert table explaining what's in the dataset, can include citations
 ```
 
 Create function to choose a month for each wave
@@ -71,33 +77,38 @@ wave_to_month_function <-  (function(WAVE) {
 wave_to_month_function_V <- Vectorize(wave_to_month_function) #vectorize function
 ```
 
-Create tidy dataset -- maybe can combine filled & summary into one chunk?
+#All Catch
 
-```{r create tidy dataset}
+Create tidy dataset
+
+```{r create tidy dataset for all fish}
 fish.tidy <- fish.dat %>%
   select(YEAR, WAVE, MODE_FX, AREA_X, TOT_CAT) %>%
   mutate(MONTH = wave_to_month_function_V(WAVE)) %>%
   mutate(DATE = my(paste0(MONTH, "-", YEAR))) %>%
   select(DATE, MONTH, YEAR, MODE_FX, AREA_X, TOT_CAT)
 
-fish.tidy.filled <- fish.tidy %>%
-  mutate(TOT_CAT =
-           na.approx(TOT_CAT))
-
 fish.tidy.summary <- fish.tidy %>%
   select(DATE, MONTH, YEAR, TOT_CAT) %>%
   group_by(DATE) %>%
-  summarise(TOT_CAT_ALL = sum(TOT_CAT)) #does not have NAs but does have missing observations
-#approximate these later (just testing ts again for now)
+  summarise(TOT_CAT_ALL = sum(TOT_CAT)) 
 
-#need to verify if sum of TOT_CAT is ok/why there are so many different point for each
-#possibly due to different combinations of areas, zones of fishing, etc
+date_list <- as.data.frame(seq.Date(from = as.Date(first(fish.tidy.summary$DATE)), to = as.Date(last(fish.tidy.summary$DATE)), by = "2 months"))
+colnames(date_list) <- c("DATE")
+
+fish.summary.interpolate <- left_join(date_list, fish.tidy.summary)
+sum(is.na(fish.summary.interpolate$TOT_CAT_ALL)) #only 11 NAs! <- OLD DATA. New data has 18 NAs
+fish.summary.interpolate$TOT_CAT_ALL <- na.approx(fish.summary.interpolate$TOT_CAT_ALL)
+
+  ## do we need this? Jan is usually the minimum, so interpolating might
+  ## mess up our data more. Annie will ask Luana about.
+
 ```
 
 Plot line graph of total catch over time
 
 ```{r}
-ggplot(fish.tidy, aes(x = DATE, y = TOT_CAT)) +
+ggplot(fish.summary.interpolate, aes(x = DATE, y = TOT_CAT_ALL)) +
   geom_line() +
   geom_smooth(method = "lm")+
   labs(x="Date", y="Total Catch")+
@@ -108,55 +119,28 @@ ggplot(fish.tidy, aes(x = DATE, y = TOT_CAT)) +
 
 Convert to time series dataset and plot accordingly
 
-```{r create time series dataset}
-fmonth <- month(first(fish.tidy.filled$DATE))
-fyear <- year(first(fish.tidy.filled$DATE))
-
-## with tidy.filled dataset -- maybe we can delete this whole chunk?
-fish.monthly.ts <- ts(fish.tidy.filled$TOT_CAT, 
-                             start = c(fyear, fmonth),frequency = 6)
-month.decomp <- stl(fish.monthly.ts, s.window = "periodic")
-plot(month.decomp)
-```
-
-The display above shows a solid chunk for 'seasonal,' so the code below summarizes the data before plotting again.
-
 ```{r create time series summary dataset}
-fmonth <- month(first(fish.tidy.filled$DATE)) #copied down here too in case we delete the prev chunk
-fyear <- year(first(fish.tidy.filled$DATE))
+fmonth <- month(first(fish.summary.interpolate$DATE))
+fyear <- year(first(fish.summary.interpolate$DATE))
 
-fish.tidy.summary.ts <- ts(fish.tidy.summary$TOT_CAT_ALL, 
+fish.summary.interpolate.ts <- ts(fish.summary.interpolate$TOT_CAT_ALL, 
                            start = c(fyear, fmonth),frequency = 6)
-summary.ts.decomp <- stl(fish.tidy.summary.ts, s.window = "periodic")
-plot(summary.ts.decomp)
+fish.summary.ts.decomp <- stl(fish.summary.interpolate.ts, s.window = "periodic")
+plot(fish.summary.ts.decomp)
 ```
 
-Time Series projects has a function called autoplot(), which functions as ggplot for Time Series. This makes the plotting smoother, and helps with visualizations if TS is running correctly. It requires ggfortify and ggplot. autoplot(TS object)
-
-```{r autoplot}
-autoplot(fish.tidy.summary.ts)
-## this does look the same as the ggplot() made in the next chunk. does it have features that make it better / that we should include?
-```
+Explain what lines / trends mean https://stats.stackexchange.com/questions/7876/interpreting-range-bars-in-rs-plot-stl
 
 
 ```{r}
-ggplot(fish.tidy.summary, aes(x = DATE, y = TOT_CAT_ALL)) +
-  geom_line()+
-  geom_smooth(method = "lm", se = FALSE)+ ## se = FALSE removes the stdev buffer
-  labs(x = "Date", y = "Total Catch")+
-  scale_x_date(date_breaks = "2 year", date_labels = "%Y")+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+fish.trend <- Kendall::SeasonalMannKendall(fish.summary.interpolate.ts)
+fish.trend
 
-```
+fish.ts.output <- summary(fish.summary.ts.decomp) #summary info includes min, mean, max, etc for each component
+#also shows % for each - amount of variation explained, maybe? 
+# the % is IQR seasonal / IQR data (etc.)
+# Annie will check with Luana
 
-```{r}
-fish.tidy.trend <- Kendall::SeasonalMannKendall(fish.tidy.summary.ts)
-fish.tidy.trend
-
-ts_summary <- summary(summary.ts.decomp) #summary info includes min, mean, max, etc for each component
-#also shows % for each - amount of variation explained, maybe?
-
-## maybe could create a dataframe & make a table out of this?
 ```
 
 Forecasting Analysis
@@ -171,22 +155,104 @@ holt winters is holts trend but w added seasonality (maybe?)
 double season holt winters allows for seasonality on multiple scales, e.g. month and year
 SARIMA adds seasonal component to ARIMA
 
+plots next 2 years bc h = 12 periods, & each period is 2 months
+
+
 ```{r HW}
-holtsfish <- HoltWinters(fish.tidy.summary.ts)
+holtsfish <- HoltWinters(fish.summary.interpolate.ts)
 fish.predict.HW <- forecast(holtsfish, h=12, findfrequency = TRUE)
 plot(fish.predict.HW,
     xlab= "Date", ylab = "Total Catch", main = "Holt Winters Total Catch Forecasts")
-
-#^plots next 2 years^
-
-## cool!
 ```
 
-```{r ARIMA}
-arima.fish <- auto.arima(fish.tidy.summary.ts)
-plot(arima.fish)
-#oh no?????
+#Blue Fish
 
-## what does this mean? looks like it could be super complicated statistics..
+#Black Sea Bass
+
+Create tidy dataset
+
+```{r create tidy dataset for black sea bass}
+bass.tidy <- bass.dat %>%
+  select(YEAR, WAVE, MODE_FX, AREA_X, TOT_CAT) %>%
+  mutate(MONTH = wave_to_month_function_V(WAVE)) %>%
+  mutate(DATE = my(paste0(MONTH, "-", YEAR))) %>%
+  select(DATE, MONTH, YEAR, MODE_FX, AREA_X, TOT_CAT)
+
+bass.tidy.summary <- bass.tidy %>%
+  select(DATE, MONTH, YEAR, TOT_CAT) %>%
+  group_by(DATE) %>%
+  summarise(TOT_CAT_ALL = sum(TOT_CAT)) 
+
+date_list <- as.data.frame(seq.Date(from = as.Date(first(bass.tidy.summary$DATE)), to = as.Date(last(bass.tidy.summary$DATE)), by = "2 months"))
+colnames(date_list) <- c("DATE")
+
+bass.summary.interpolate <- left_join(date_list, bass.tidy.summary)
+sum(is.na(bass.summary.interpolate$TOT_CAT_ALL)) #only 13 NAs!
+
+bass.summary.interpolate$TOT_CAT_ALL <- na.approx(bass.summary.interpolate$TOT_CAT_ALL)
+
+  ## do we need this? Jan is usually the minimum, so interpolating might
+  ## mess up our data more. Annie will ask Luana about.
+
+```
+
+Plot line graph of total catch over time
+
+```{r}
+ggplot(bass.summary.interpolate, aes(x = DATE, y = TOT_CAT_ALL)) +
+  geom_line() +
+  geom_smooth(method = "lm")+
+  labs(x="Date", y="Total Catch")+
+  scale_x_date(date_breaks = "2 year", date_labels = "%Y")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+Convert to time series dataset and plot accordingly
+
+```{r create time series summary dataset}
+fmonth <- month(first(bass.summary.interpolate$DATE))
+fyear <- year(first(bass.summary.interpolate$DATE))
+
+bass.summary.interpolate.ts <- ts(bass.summary.interpolate$TOT_CAT_ALL, 
+                           start = c(fyear, fmonth),frequency = 6)
+bass.summary.ts.decomp <- stl(bass.summary.interpolate.ts, s.window = "periodic")
+plot(bass.summary.ts.decomp)
+```
+
+Explain what lines / trends mean https://stats.stackexchange.com/questions/7876/interpreting-range-bars-in-rs-plot-stl
+
+
+```{r}
+bass.trend <- Kendall::SeasonalMannKendall(bass.summary.interpolate.ts)
+bass.trend
+
+bass.ts.output <- summary(bass.summary.ts.decomp) #summary info includes min, mean, max, etc for each component
+#also shows % for each - amount of variation explained, maybe? 
+# the % is IQR seasonal / IQR data (etc.)
+# Annie will check with Luana
+
+```
+
+Forecasting Analysis
+
+forecasting: use forecast fxn but have to specify a method
+naive: uses most recent observation to forecast next one (NO)
+exponential smoothing: extension of above, use weighted averages of past observations - more recent obs get weighted higher (NO)
+holts trend: extension of above, considers trend component - 2 smoothing eqtns (maybe?)
+ARIMA: v popular. tries to describe autocorrelations rather than basing on trend and seasonality (NO)
+TBATS: combines trig terms for seasonality, heterogeneity, short-term error dynamics, trend, and seasonal components (maybe?)
+holt winters is holts trend but w added seasonality (maybe?)
+double season holt winters allows for seasonality on multiple scales, e.g. month and year
+SARIMA adds seasonal component to ARIMA
+
+plots next 2 years bc h = 12 periods, & each period is 2 months
+
+
+```{r HW}
+holtsbass <- HoltWinters(bass.summary.interpolate.ts)
+bass.predict.HW <- forecast(holtsbass, h=12, findfrequency = TRUE)
+plot(bass.predict.HW,
+    xlab= "Date", ylab = "Total Catch", main = "Holt Winters Total Catch Forecasts")
 ```
 

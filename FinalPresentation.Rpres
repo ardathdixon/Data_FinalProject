@@ -1,0 +1,276 @@
+What's the Catch? Recreational Fishing Trends in North Carolina (1990-2019)
+========================================================
+author: Ardath Dixon, Annie Harshbarger, Eva May
+date: Spring 2021
+autosize: true
+
+```{r title page, echo = FALSE, fig.align = 'right', out.width = "45%"}
+include_graphics('./BlackSeaBass.jpg') 
+
+## found this online at https://www.carolinasportsman.com/fishing/offshore-fishing/black-sea-bass/black-sea-bass-give-little-river-a-great-bottomfish-option/
+```
+
+Data and Research Questions
+========================================================
+
+
+Data retrieved from NOAA Marine Recreational Information Program download query tool
+
+- Recreational fisheries catch totals for North Carolina, 1990-2019
+
+- All species, bluefish (*Pomatomus saltatrix*), and black sea bass (*Centropristis striata*) 
+
+- Multiple modes of fishing and areas where fishing occurred
+
+- Organized in waves (2-month periods)
+
+
+Research questions
+
+- Are there changes in the amount of these fish caught over time?
+
+- Do these trends differ for bluefish, black sea bass, and all species combined?
+
+A Preview of the Data
+========================================================
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(lubridate)
+library(dplyr)
+library(tidyverse)
+library(ggplot2)
+library(zoo)
+library(trend)
+library(tidyr)
+library(forecast)
+library(astsa)
+library(cowplot)
+
+fish.dat <- readxl::read_excel("../Data_FinalProject/Data/Raw/mrip_estim_catch_wave_1990_2019_NC.xlsx")
+blue.dat <- read.csv("../Data_FinalProject/Data/Raw/BLUEFISH_mrip_estim_catch_wave_1990_2019_nc.csv")
+bass.dat <- read.csv("../Data_FinalProject/Data/Raw/BSB_mrip_estim_catch_wave_1990_2019_nc.csv")
+
+
+ourtheme <- theme_light(base_size = 14)+
+    theme(axis.text = element_text(color = "black"), legend.position = "top")
+theme_set(ourtheme)
+
+wave_to_month_function <-  (function(WAVE) {
+  if(WAVE == 1) {
+    "Jan"
+  }
+  else if(WAVE == 2) {
+    "Mar"
+  }
+  else if(WAVE == 3) {
+    "May"
+  }
+  else if(WAVE == 4) {
+    "Jul"
+  }
+  else if(WAVE == 5) {
+    "Sep"
+  }
+  else {
+    "Nov"
+  }
+})
+
+wave_to_month_function_V <- Vectorize(wave_to_month_function) #vectorize function
+```
+ 
+```{r, include=FALSE}
+## all
+fish.tidy <- fish.dat %>%
+  select(YEAR, WAVE, MODE_FX, AREA_X, TOT_CAT) %>%
+  mutate(MONTH = wave_to_month_function_V(WAVE)) %>%
+  mutate(DATE = my(paste0(MONTH, "-", YEAR))) %>%
+  select(DATE, MONTH, YEAR, MODE_FX, AREA_X, TOT_CAT)
+
+fish.tidy.summary <- fish.tidy %>%
+  select(DATE, MONTH, YEAR, TOT_CAT) %>%
+  group_by(DATE) %>%
+  summarise(TOT_CAT_ALL = sum(TOT_CAT)) 
+
+date_list <- as.data.frame(seq.Date(from = as.Date(first(fish.tidy.summary$DATE)), to = as.Date(last(fish.tidy.summary$DATE)), by = "2 months"))
+colnames(date_list) <- c("DATE")
+
+fish.summary.interpolate <- left_join(date_list, fish.tidy.summary)
+sum(is.na(fish.summary.interpolate$TOT_CAT_ALL)) #only 11 NAs! <- OLD DATA. New data has 18 NAs
+fish.summary.interpolate$TOT_CAT_ALL <- na.approx(fish.summary.interpolate$TOT_CAT_ALL)
+
+##blue
+blue.tidy <- blue.dat %>%
+  select(YEAR, WAVE, MODE_FX, AREA_X, TOT_CAT) %>%
+  mutate(MONTH = wave_to_month_function_V(WAVE)) %>%
+  mutate(DATE = my(paste0(MONTH, "-", YEAR))) %>%
+  select(DATE, MONTH, YEAR, MODE_FX, AREA_X, TOT_CAT)
+
+blue.tidy.summary <- blue.tidy %>%
+  select(DATE, MONTH, YEAR, TOT_CAT) %>%
+  group_by(DATE) %>%
+  summarise(TOT_CAT_ALL = sum(TOT_CAT)) 
+
+date_list <- as.data.frame(seq.Date(from = as.Date(first(blue.tidy.summary$DATE)), to = as.Date(last(blue.tidy.summary$DATE)), by = "2 months"))
+colnames(date_list) <- c("DATE")
+
+blue.summary.interpolate <- left_join(date_list, blue.tidy.summary)
+sum(is.na(blue.summary.interpolate$TOT_CAT_ALL))
+blue.summary.interpolate$TOT_CAT_ALL <- na.approx(blue.summary.interpolate$TOT_CAT_ALL)
+
+## bass
+bass.tidy <- bass.dat %>%
+  select(YEAR, WAVE, MODE_FX, AREA_X, TOT_CAT) %>%
+  mutate(MONTH = wave_to_month_function_V(WAVE)) %>%
+  mutate(DATE = my(paste0(MONTH, "-", YEAR))) %>%
+  select(DATE, MONTH, YEAR, MODE_FX, AREA_X, TOT_CAT)
+
+bass.tidy.summary <- bass.tidy %>%
+  select(DATE, MONTH, YEAR, TOT_CAT) %>%
+  group_by(DATE) %>%
+  summarise(TOT_CAT_ALL = sum(TOT_CAT)) 
+
+date_list <- as.data.frame(seq.Date(from = as.Date(first(bass.tidy.summary$DATE)), to = as.Date(last(bass.tidy.summary$DATE)), by = "2 months"))
+colnames(date_list) <- c("DATE")
+
+bass.summary.interpolate <- left_join(date_list, bass.tidy.summary)
+sum(is.na(bass.summary.interpolate$TOT_CAT_ALL))
+bass.summary.interpolate$TOT_CAT_ALL <- na.approx(bass.summary.interpolate$TOT_CAT_ALL)
+## cowplot w the time series components
+```
+
+Original Dataset
+
+```{r echo = FALSE}
+head(fish.dat[,c(1:7,16)])
+
+```
+
+Wrangled Dataset
+
+```{r echo = FALSE}
+head(fish.summary.interpolate)
+
+```
+
+
+Total Catch 1990-2019
+========================================================
+
+
+```{r ggplot, echo=FALSE, fig.height = 8, fig.width = 12}
+fish_ggplot <- ggplot(fish.summary.interpolate, aes(x = DATE, y = TOT_CAT_ALL)) +
+  geom_line() +
+  geom_smooth(method = "lm")+
+  labs(x="Date", y="Total Catch", title = "Total Catch All Fish")+
+  scale_x_date(date_breaks = "2 year", date_labels = "%Y")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+blue_ggplot <- ggplot(blue.summary.interpolate, aes(x = DATE, y = TOT_CAT_ALL)) +
+  geom_line() +
+  geom_smooth(method = "lm")+
+  labs(x="Date", y="Total Catch", title = "Total Catch Bluefish")+
+  scale_x_date(date_breaks = "2 year", date_labels = "%Y")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+bass_ggplot <- ggplot(bass.summary.interpolate, aes(x = DATE, y = TOT_CAT_ALL)) +
+  geom_line() +
+  geom_smooth(method = "lm")+
+  labs(x="Date", y="Total Catch", title = "Total Catch Black Sea Bass")+
+  scale_x_date(date_breaks = "2 year", date_labels = "%Y")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+plot_grid(fish_ggplot, blue_ggplot, bass_ggplot, nrow = 3)
+```
+
+Time Series Trends - All Fish
+========================================================
+
+```{r, echo=FALSE, fig.width = 10, fig.height = 8}
+fish.fmonth <- month(first(fish.summary.interpolate$DATE))
+fish.fyear <- year(first(fish.summary.interpolate$DATE))
+
+fish.summary.interpolate.ts <- ts(fish.summary.interpolate$TOT_CAT_ALL, 
+                           start = c(fish.fyear, fish.fmonth),frequency = 6)
+fish.summary.ts.decomp <- stl(fish.summary.interpolate.ts, s.window = "periodic")
+plot(fish.summary.ts.decomp)
+
+```
+
+Time Series Trends - Bluefish
+========================================================
+
+```{r, echo=FALSE, fig.width = 10, fig.height = 8}
+blue.fmonth <- month(first(blue.summary.interpolate$DATE))
+blue.fyear <- year(first(blue.summary.interpolate$DATE))
+
+blue.summary.interpolate.ts <- ts(blue.summary.interpolate$TOT_CAT_ALL, 
+                           start = c(blue.fyear, blue.fmonth),frequency = 6)
+blue.summary.ts.decomp <- stl(blue.summary.interpolate.ts, s.window = "periodic")
+plot(blue.summary.ts.decomp)
+
+```
+
+Time Series Trends - Black Sea Bass
+========================================================
+
+```{r, echo=FALSE, fig.width = 10, fig.height = 8}
+bass.fmonth <- month(first(bass.summary.interpolate$DATE))
+bass.fyear <- year(first(bass.summary.interpolate$DATE))
+
+bass.summary.interpolate.ts <- ts(bass.summary.interpolate$TOT_CAT_ALL, 
+                           start = c(bass.fyear, bass.fmonth),frequency = 6)
+bass.summary.ts.decomp <- stl(bass.summary.interpolate.ts, s.window = "periodic")
+plot(bass.summary.ts.decomp)
+
+```
+
+Monotonic Trend Analysis
+========================================================
+
+Seasonal Mann-Kendall Test
+
+All species
+
+```{r, echo=FALSE}
+fish.trend <- Kendall::SeasonalMannKendall(fish.summary.interpolate.ts)
+fish.trend
+
+```
+
+Bluefish
+
+```{r, echo=FALSE}
+blue.trend <- Kendall::SeasonalMannKendall(blue.summary.interpolate.ts)
+blue.trend
+
+```
+
+Black sea bass
+
+```{r, echo=FALSE}
+bass.trend <- Kendall::SeasonalMannKendall(bass.summary.interpolate.ts)
+bass.trend
+
+```
+
+For both individual species and all species combined, **reject the null hypothesis that there is no trend.
+
+Forecasting
+========================================================
+
+```{r, echo=FALSE, fig.height = 8, fig.width = 12}
+holtsfish <- HoltWinters(fish.summary.interpolate.ts)
+fish.predict.HW <- forecast(holtsfish, h=30, findfrequency = TRUE)
+fish.predict.plot <- plot(fish.predict.HW,
+    xlab= "Date", ylab = "Total Catch", main = "Holt Winters Total Catch Forecasts")
+
+#plot_grid(fish.predict.plot, blue.predict.plot, bass.predict.plot, nrow = 3)
+## or whatever names you choose
+```
+
+Discussion
+========================================================
+Text of why stuff happened.
