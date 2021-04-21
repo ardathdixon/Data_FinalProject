@@ -11,23 +11,22 @@ include_graphics('./BlackSeaBass.jpg')
 ```
 
 Data and Research Questions
-========================================================
+========================================================  
+<br />
 
+## Data retrieved from NOAA Marine Recreational Information Program download query tool
 
-Data retrieved from NOAA Marine Recreational Information Program download query tool
-
-- Recreational fisheries catch totals for North Carolina, 1990-2019
+- Bimonthly recreational fisheries catch totals for NC, 1990-2019
 
 - All species, bluefish (*Pomatomus saltatrix*), and black sea bass (*Centropristis striata*) 
 
-- Multiple modes of fishing and areas where fishing occurred
+- Multiple areas and modes of fishing  
 
-- Organized in waves (2-month periods)
+<br />
 
+## Research questions
 
-Research questions
-
-- Are there changes in the amount of these fish caught over time?
+- Are there trends in the amount of these fish caught over time?
 
 - Do these trends differ for bluefish, black sea bass, and all species combined?
 
@@ -54,7 +53,7 @@ blue.dat <- read.csv("../Data_FinalProject/Data/Raw/BLUEFISH_mrip_estim_catch_wa
 bass.dat <- read.csv("../Data_FinalProject/Data/Raw/BSB_mrip_estim_catch_wave_1990_2019_nc.csv")
 
 
-ourtheme <- theme_light(base_size = 14)+
+ourtheme <- theme_light(base_size = 18)+
     theme(axis.text = element_text(color = "black"), legend.position = "top")
 theme_set(ourtheme)
 
@@ -142,14 +141,14 @@ bass.summary.interpolate$TOT_CAT_ALL <- na.approx(bass.summary.interpolate$TOT_C
 ## cowplot w the time series components
 ```
 
-Original Dataset
+## Original Dataset
 
 ```{r echo = FALSE}
 head(fish.dat[,c(1:7,16)])
 
 ```
 
-Wrangled Dataset
+## Wrangled Dataset
 
 ```{r echo = FALSE}
 head(fish.summary.interpolate)
@@ -161,7 +160,7 @@ Total Catch 1990-2019
 ========================================================
 
 
-```{r ggplot, echo=FALSE, fig.height = 8, fig.width = 12}
+```{r ggplot, echo=FALSE, fig.height = 10, fig.width = 16}
 fish_ggplot <- ggplot(fish.summary.interpolate, aes(x = DATE, y = TOT_CAT_ALL)) +
   geom_line() +
   geom_smooth(method = "lm")+
@@ -189,7 +188,7 @@ plot_grid(fish_ggplot, blue_ggplot, bass_ggplot, nrow = 3)
 Time Series Trends - All Fish
 ========================================================
 
-```{r, echo=FALSE, fig.width = 10, fig.height = 8}
+```{r, echo=FALSE, fig.width = 16, fig.height = 10}
 fish.fmonth <- month(first(fish.summary.interpolate$DATE))
 fish.fyear <- year(first(fish.summary.interpolate$DATE))
 
@@ -203,7 +202,7 @@ plot(fish.summary.ts.decomp)
 Time Series Trends - Bluefish
 ========================================================
 
-```{r, echo=FALSE, fig.width = 10, fig.height = 8}
+```{r, echo=FALSE, fig.width = 16, fig.height = 10}
 blue.fmonth <- month(first(blue.summary.interpolate$DATE))
 blue.fyear <- year(first(blue.summary.interpolate$DATE))
 
@@ -217,7 +216,7 @@ plot(blue.summary.ts.decomp)
 Time Series Trends - Black Sea Bass
 ========================================================
 
-```{r, echo=FALSE, fig.width = 10, fig.height = 8}
+```{r, echo=FALSE, fig.width = 16, fig.height = 10}
 bass.fmonth <- month(first(bass.summary.interpolate$DATE))
 bass.fyear <- year(first(bass.summary.interpolate$DATE))
 
@@ -231,9 +230,9 @@ plot(bass.summary.ts.decomp)
 Monotonic Trend Analysis
 ========================================================
 
-Seasonal Mann-Kendall Test
-
-All species
+## Seasonal Mann-Kendall Test
+<br />
+### All species
 
 ```{r, echo=FALSE}
 fish.trend <- Kendall::SeasonalMannKendall(fish.summary.interpolate.ts)
@@ -241,7 +240,7 @@ fish.trend
 
 ```
 
-Bluefish
+### Bluefish
 
 ```{r, echo=FALSE}
 blue.trend <- Kendall::SeasonalMannKendall(blue.summary.interpolate.ts)
@@ -249,7 +248,7 @@ blue.trend
 
 ```
 
-Black sea bass
+### Black sea bass
 
 ```{r, echo=FALSE}
 bass.trend <- Kendall::SeasonalMannKendall(bass.summary.interpolate.ts)
@@ -257,12 +256,14 @@ bass.trend
 
 ```
 
-For both individual species and all species combined, **reject the null hypothesis that there is no trend.
+<br />
 
-Forecasting
+For both individual species and all species combined, **reject the null hypothesis** that there is no trend.
+
+Holt-Winters Forecasting
 ========================================================
 
-```{r, echo=FALSE, fig.height = 8, fig.width = 12}
+```{r, echo=FALSE, fig.height = 10, fig.width = 16}
 holtsfish <- HoltWinters(fish.summary.interpolate.ts)
 fish.predict.HW <- forecast(holtsfish, h=30, findfrequency = TRUE)
 fish.predict.plot <- autoplot(fish.predict.HW,
@@ -280,13 +281,36 @@ bass.predict.plot <- autoplot(bass.predict.HW,
 
 plot_grid(fish.predict.plot, blue.predict.plot, bass.predict.plot, nrow = 3)
 
+#forecasting: note that Holt Winters weighs more recent data more heavily than older data (e.g. bluefish total trend is positive but forecasted trend looks negative) and predicts data without much noise in it, which is unlikely to be the case IRL. Useful visualization but inaccurate bc of complexities in fishing data. (could go above w forecasting slides)
+
 ```
 
 Discussion
 ========================================================
-Text of why stuff happened.
-[note:just ideas/scattered thoughts below]
-forecasting: note that Holt Winters weighs more recent data more heavily than older data (e.g. bluefish total trend is postiive but forecasted trend looks negative) and predicts data without much noise in it, which is unlikely to be the case IRL. Useful visualization but inaccurate bc of complexities in fishing data. (could go above w forecasting slides)
+<br />
 
-general trends: Seasonal trends look different between all species, bluefish, and seabass. Can be from different fishing seasons and fish availability throughout the year. Overall positive trend in all fish species catch is due to [how many?] different species' influence, so blue and BSB catch won't necessarily align with this. but we do see a postiive trend in each one, albeit to differing extents. Irregularities in these data can occur due to shifts in policy, e.g. recreational catch limits or changes in limits. Recreational catch data are also estimates based on surveys - they use the best available science from NOAA but ultimately cannot 100% accurately reflect actual catch numbers, which would require accurate self reporting from every rec fisher in NC. 
+### Strong seasonal trends
++ Bimodal peaks for bluefish
++ Possibly due to effort, fish abundance
 
+<br />
+
+### Overall positive trend
++ Increase in recreational fishing
++ Variation from changing regulations, behavior
+
+Discussion
+========================================================
+<br />
+
+### Limitations
++ Data collection: Estimates based on surveys of fishers 
++ Interpolation
++ Uncertainty in forecasting
+
+<br />
+
+### Future recommendations
++ Comparisons of other species or other states
++ Catch per unit effort
++ Include earlier data
