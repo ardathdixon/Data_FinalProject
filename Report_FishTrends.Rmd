@@ -39,6 +39,8 @@ library(tidyr)
 library(forecast)
 library(astsa)
 library(cowplot)
+library(knitr)
+library(kableExtra)
 
 # Set your ggplot theme
 ourtheme <- theme_light(base_size = 18)+
@@ -54,9 +56,7 @@ bass.dat <- read.csv("../Data_FinalProject/Data/Raw/BSB_mrip_estim_catch_wave_19
 
 # Rationale and Research Questions
 
-- Are there trends in the amount of these fish caught over time?
-
-- Do these trends differ for bluefish, black sea bass, and all species combined?
+- Are there trends in the amount of these fish caught over time? How do they compare?
 
 - What could these trends look like in the future?
 
@@ -73,10 +73,19 @@ Data retrieved from NOAA Marine Recreational Information Program download query 
 
 - Multiple areas and modes of fishing  
 
-\newpage
 
-# Exploratory Analysis 
+```{r table1, echo = FALSE}
+names <- c("Data Source", "Retrieved from", "Variables Used", "Date Range")
+details <-c("NOAA MRIP", "https://www.fisheries.noaa.gov/data-tools/recreational-fisheries-statistics-queries", "Year, Wave, Total Catch, Mode, Area", "January 1990 - December 2019")
+dataset_df <- data.frame(names, details)
+names(dataset_df) <- c("Detail", "Description")
 
+dataset_table <- kable(dataset_df, caption = "General Information About the Data Used") %>%
+    column_spec(1,width = "1.5in") %>%
+    column_spec(2,width = "5in") %>%
+    kable_styling(latex_options = "HOLD_position")
+dataset_table
+```
 ```{r wave to month, include=FALSE}
 wave_to_month_function <-  (function(WAVE) {
   if(WAVE == 1) {
@@ -121,6 +130,8 @@ fish.summary.interpolate <- left_join(date_list, fish.tidy.summary)
 sum(is.na(fish.summary.interpolate$TOT_CAT_ALL)) #only 11 NAs! <- OLD DATA. New data has 18 NAs
 fish.summary.interpolate$TOT_CAT_ALL <- na.approx(fish.summary.interpolate$TOT_CAT_ALL)
 
+write.csv(fish.summary.interpolate, './Data/Processed/fish_summary_interpolate.csv')
+
 ##blue
 blue.tidy <- blue.dat %>%
   select(YEAR, WAVE, MODE_FX, AREA_X, TOT_CAT) %>%
@@ -140,6 +151,9 @@ blue.summary.interpolate <- left_join(date_list, blue.tidy.summary)
 sum(is.na(blue.summary.interpolate$TOT_CAT_ALL))
 blue.summary.interpolate$TOT_CAT_ALL <- na.approx(blue.summary.interpolate$TOT_CAT_ALL)
 
+write.csv(blue.summary.interpolate, './Data/Processed/blue_summary_interpolate.csv')
+
+
 ## bass
 bass.tidy <- bass.dat %>%
   select(YEAR, WAVE, MODE_FX, AREA_X, TOT_CAT) %>%
@@ -158,22 +172,43 @@ colnames(date_list) <- c("DATE")
 bass.summary.interpolate <- left_join(date_list, bass.tidy.summary)
 sum(is.na(bass.summary.interpolate$TOT_CAT_ALL))
 bass.summary.interpolate$TOT_CAT_ALL <- na.approx(bass.summary.interpolate$TOT_CAT_ALL)
-## cowplot w the time series components
+
+write.csv(bass.summary.interpolate, './Data/Processed/bass_summary_interpolate.csv')
 ```
 
-```{r echo = FALSE}
-head(fish.dat[,c(1:7,16)])
-```
 
-```{r echo = FALSE}
-head(fish.summary.interpolate)
-```
+```{r table2, echo = FALSE}
+col1 <- c("Minimum", "Mean", 'Median', "Maximum")
 
+col2 <- c(min(fish.summary.interpolate$TOT_CAT_ALL),
+          mean(fish.summary.interpolate$TOT_CAT_ALL), 
+          median(fish.summary.interpolate$TOT_CAT_ALL),
+          max(fish.summary.interpolate$TOT_CAT_ALL))
+
+col3 <- c(min(blue.summary.interpolate$TOT_CAT_ALL),
+          mean(blue.summary.interpolate$TOT_CAT_ALL), 
+          median(blue.summary.interpolate$TOT_CAT_ALL),
+          max(blue.summary.interpolate$TOT_CAT_ALL))
+
+col4 <- c(min(bass.summary.interpolate$TOT_CAT_ALL),
+          mean(bass.summary.interpolate$TOT_CAT_ALL), 
+          median(bass.summary.interpolate$TOT_CAT_ALL),
+          max(bass.summary.interpolate$TOT_CAT_ALL))
+
+dataset_df2 <- data.frame(col1, col2, col3, col4)
+names(dataset_df2) <- c("Summary Statistics", "All Fish", "Bluefish", "Black Sea Bass")
+
+dataset_table2 <- kable(dataset_df2, caption = "Total Catch Summaries") %>%
+    kable_styling(latex_options = "HOLD_position")
+dataset_table2
+```
 \newpage
 
-# Analysis
+# Exploratory Analysis 
 
-```{r ggplot, echo=FALSE, fig.height = 10, fig.width = 16}
+##code and table of number of NAs per fish category
+
+```{r ggplot, echo=FALSE, message=FALSE, fig.height = 10, fig.width = 16, fig.cap = "Catch Patterns over Time"}
 fish_ggplot <- ggplot(fish.summary.interpolate, aes(x = DATE, y = TOT_CAT_ALL)) +
   geom_line() +
   geom_smooth(method = "lm")+
@@ -198,7 +233,13 @@ bass_ggplot <- ggplot(bass.summary.interpolate, aes(x = DATE, y = TOT_CAT_ALL)) 
 plot_grid(fish_ggplot, blue_ggplot, bass_ggplot, nrow = 3)
 ```
 
-## Question 1: Are there trends in the amount of these fish caught over time?
+\newpage
+
+# Analysis
+
+
+
+## Question 1: Are there trends in the amount of these fish caught over time? How do they compare?
 
 ```{r, echo=FALSE, fig.width = 16, fig.height = 10}
 fish.fmonth <- month(first(fish.summary.interpolate$DATE))
@@ -216,7 +257,6 @@ fish.trend <- Kendall::SeasonalMannKendall(fish.summary.interpolate.ts)
 fish.trend
 
 ```
-## Question 2: Do these trends differ for bluefish, black sea bass, and all species combined?
 
 ```{r, echo=FALSE, fig.width = 16, fig.height = 10}
 blue.fmonth <- month(first(blue.summary.interpolate$DATE))
@@ -254,7 +294,7 @@ bass.trend
 
 For both individual species and all species combined, **reject the null hypothesis** that there is no trend.
 
-## Question 3: What could these trends look like in the future?
+## Question 2: What could these trends look like in the future?
 
 ```{r, echo=FALSE, fig.height = 10, fig.width = 16}
 holtsfish <- HoltWinters(fish.summary.interpolate.ts)
