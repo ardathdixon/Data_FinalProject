@@ -39,7 +39,7 @@
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
 \IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
 \hypersetup{
-  pdftitle={Recreational Fishing Trends in North Carolina (1990-2019)},
+  pdftitle={What's the Catch? Recreational Fishing Trends in North Carolina (1990-2019)},
   pdfauthor={Ardath Dixon, Annie Harshbarger, Eva May},
   hidelinks,
   pdfcreator={LaTeX via pandoc}}
@@ -66,7 +66,8 @@
   \usepackage{selnolig}  % disable illegal ligatures
 \fi
 
-\title{Recreational Fishing Trends in North Carolina (1990-2019)}
+\title{What's the Catch? Recreational Fishing Trends in North Carolina
+(1990-2019)}
 \usepackage{etoolbox}
 \makeatletter
 \providecommand{\subtitle}[1]{% add subtitle to \maketitle
@@ -92,33 +93,163 @@
 \section{Rationale and Research
 Questions}\label{rationale-and-research-questions}}
 
+\begin{itemize}
+\item
+  Are there trends in the amount of these fish caught over time?
+\item
+  Do these trends differ for bluefish, black sea bass, and all species
+  combined?
+\item
+  What could these trends look like in the future?
+\end{itemize}
+
 \newpage
 
 \hypertarget{dataset-information}{%
 \section{Dataset Information}\label{dataset-information}}
+
+Data retrieved from NOAA Marine Recreational Information Program
+download query tool
+
+\begin{itemize}
+\item
+  Bimonthly recreational fisheries catch totals for NC, 1990-2019
+\item
+  All species, bluefish (\emph{Pomatomus saltatrix}), and black sea bass
+  (\emph{Centropristis striata})
+\item
+  Multiple areas and modes of fishing
+\end{itemize}
 
 \newpage
 
 \hypertarget{exploratory-analysis}{%
 \section{Exploratory Analysis}\label{exploratory-analysis}}
 
+\begin{verbatim}
+## # A tibble: 6 x 8
+##    YEAR  WAVE SUB_REG    ST    SP_CODE MODE_FX AREA_X TOT_CAT
+##   <dbl> <dbl>   <dbl> <dbl>      <dbl>   <dbl>  <dbl>   <dbl>
+## 1  1990     1       6    37 8710010201       3      1 203578.
+## 2  1990     1       6    37 8713040113       3      1   9693.
+## 3  1990     1       6    37 8713040115       3      1   3987.
+## 4  1990     1       6    37 8777020101       7      5 153212.
+## 5  1990     1       6    37 8835440102       7      1  82510.
+## 6  1990     1       6    37 8835440601       7      1  25388.
+\end{verbatim}
+
+\begin{verbatim}
+##         DATE TOT_CAT_ALL
+## 1 1990-01-01    484714.5
+## 2 1990-03-01   2485857.2
+## 3 1990-05-01   9215674.2
+## 4 1990-07-01  13992342.3
+## 5 1990-09-01  11808541.6
+## 6 1990-11-01  10354163.5
+\end{verbatim}
+
 \newpage
 
 \hypertarget{analysis}{%
 \section{Analysis}\label{analysis}}
 
-\hypertarget{question-1-insert-specific-question-here-and-add-additional-subsections-for-additional-questions-below-if-needed}{%
-\subsection{Question 1: \textless insert specific question here and add
-additional subsections for additional questions below, if
-needed\textgreater{}}\label{question-1-insert-specific-question-here-and-add-additional-subsections-for-additional-questions-below-if-needed}}
+\begin{verbatim}
+## `geom_smooth()` using formula 'y ~ x'
+## `geom_smooth()` using formula 'y ~ x'
+## `geom_smooth()` using formula 'y ~ x'
+\end{verbatim}
 
-\hypertarget{question-2}{%
-\subsection{Question 2:}\label{question-2}}
+\includegraphics{Report_FishTrends_files/figure-latex/ggplot-1.pdf}
+
+\hypertarget{question-1-are-there-trends-in-the-amount-of-these-fish-caught-over-time}{%
+\subsection{Question 1: Are there trends in the amount of these fish
+caught over
+time?}\label{question-1-are-there-trends-in-the-amount-of-these-fish-caught-over-time}}
+
+\includegraphics{Report_FishTrends_files/figure-latex/unnamed-chunk-3-1.pdf}
+
+\begin{verbatim}
+## tau = 0.49, 2-sided pvalue =< 2.22e-16
+\end{verbatim}
+
+\hypertarget{question-2-do-these-trends-differ-for-bluefish-black-sea-bass-and-all-species-combined}{%
+\subsection{Question 2: Do these trends differ for bluefish, black sea
+bass, and all species
+combined?}\label{question-2-do-these-trends-differ-for-bluefish-black-sea-bass-and-all-species-combined}}
+
+\includegraphics{Report_FishTrends_files/figure-latex/unnamed-chunk-5-1.pdf}
+
+\begin{verbatim}
+## tau = 0.324, 2-sided pvalue =8.7489e-10
+\end{verbatim}
+
+\includegraphics{Report_FishTrends_files/figure-latex/unnamed-chunk-7-1.pdf}
+
+\begin{verbatim}
+## tau = 0.41, 2-sided pvalue =8.4377e-15
+\end{verbatim}
+
+For both individual species and all species combined, \textbf{reject the
+null hypothesis} that there is no trend.
+
+\hypertarget{question-3-what-could-these-trends-look-like-in-the-future}{%
+\subsection{Question 3: What could these trends look like in the
+future?}\label{question-3-what-could-these-trends-look-like-in-the-future}}
+
+\includegraphics{Report_FishTrends_files/figure-latex/unnamed-chunk-9-1.pdf}
 
 \newpage
 
 \hypertarget{summary-and-conclusions}{%
 \section{Summary and Conclusions}\label{summary-and-conclusions}}
+
+\hypertarget{strong-seasonal-trends}{%
+\subsection{Strong seasonal trends}\label{strong-seasonal-trends}}
+
+\begin{itemize}
+\tightlist
+\item
+  Bimodal peaks for bluefish
+\item
+  Possibly due to effort, fish abundance
+\end{itemize}
+
+\hypertarget{overall-positive-trend}{%
+\subsection{Overall positive trend}\label{overall-positive-trend}}
+
+\begin{itemize}
+\tightlist
+\item
+  Increase in recreational fishing
+\item
+  Variation from changing regulations, behavior
+\end{itemize}
+
+\hypertarget{limitations}{%
+\subsection{Limitations}\label{limitations}}
+
+\begin{itemize}
+\tightlist
+\item
+  Data collection: Estimates based on surveys of fishers
+\item
+  Interpolation
+\item
+  Uncertainty in forecasting
+\end{itemize}
+
+\hypertarget{future-recommendations}{%
+\subsection{Future recommendations}\label{future-recommendations}}
+
+\begin{itemize}
+\tightlist
+\item
+  Comparisons of other species or other states
+\item
+  Catch per unit effort
+\item
+  Include earlier data
+\end{itemize}
 
 \newpage
 
