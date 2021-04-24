@@ -177,6 +177,30 @@ Maximum & 34932698.46 & 5.254125e+06 & 1746847.176\\
 
 \#\#code and table of number of NAs per fish category
 
+While wrangling the data, we checked the number of waves without catch
+records for each dataset by joining the existing data to a list of all
+possible waves between Wave 1 of 1990 (represented in the dataframe by
+1990-01-01 for ease of time series analysis) and Wave 6 of 2019
+(2019-11-01). The results of this exploration, which informed our
+approach for interpolation, can be found in Table 3.
+
+\begin{table}[H]
+
+\caption{\label{tab:table3}Number of missing values from NOAA MRIP data}
+\centering
+\begin{tabular}[t]{>{\raggedright\arraybackslash}p{1.5in}|>{\raggedleft\arraybackslash}p{3in}}
+\hline
+Dataset & Number of missing values\\
+\hline
+All fish & 11\\
+\hline
+Bluefish & 17\\
+\hline
+Black sea bass & 13\\
+\hline
+\end{tabular}
+\end{table}
+
 \begin{figure}
 \centering
 \includegraphics{Report_FishTrends_files/figure-latex/ggplot-1.pdf}

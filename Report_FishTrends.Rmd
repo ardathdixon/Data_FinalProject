@@ -127,7 +127,8 @@ date_list <- as.data.frame(seq.Date(from = as.Date(first(fish.tidy.summary$DATE)
 colnames(date_list) <- c("DATE")
 
 fish.summary.interpolate <- left_join(date_list, fish.tidy.summary)
-sum(is.na(fish.summary.interpolate$TOT_CAT_ALL)) #only 11 NAs! <- OLD DATA. New data has 18 NAs
+sum(is.na(fish.summary.interpolate$TOT_CAT_ALL))#only 11 NAs! <- OLD DATA. New data has 18 NAs
+fish.before.interpolate <- fish.summary.interpolate #create copy before interpolating to quantify NAs
 fish.summary.interpolate$TOT_CAT_ALL <- na.approx(fish.summary.interpolate$TOT_CAT_ALL)
 
 write.csv(fish.summary.interpolate, './Data/Processed/fish_summary_interpolate.csv')
@@ -149,6 +150,7 @@ colnames(date_list) <- c("DATE")
 
 blue.summary.interpolate <- left_join(date_list, blue.tidy.summary)
 sum(is.na(blue.summary.interpolate$TOT_CAT_ALL))
+blue.before.interpolate <- blue.summary.interpolate #create copy before interpolating to quantify NAs
 blue.summary.interpolate$TOT_CAT_ALL <- na.approx(blue.summary.interpolate$TOT_CAT_ALL)
 
 write.csv(blue.summary.interpolate, './Data/Processed/blue_summary_interpolate.csv')
@@ -171,6 +173,7 @@ colnames(date_list) <- c("DATE")
 
 bass.summary.interpolate <- left_join(date_list, bass.tidy.summary)
 sum(is.na(bass.summary.interpolate$TOT_CAT_ALL))
+bass.before.interpolate <- bass.summary.interpolate #create copy before interpolating to quantify NAs
 bass.summary.interpolate$TOT_CAT_ALL <- na.approx(bass.summary.interpolate$TOT_CAT_ALL)
 
 write.csv(bass.summary.interpolate, './Data/Processed/bass_summary_interpolate.csv')
@@ -208,6 +211,25 @@ dataset_table2
 
 ##code and table of number of NAs per fish category
 
+While wrangling the data, we checked the number of waves without catch records for each dataset by joining the existing data to a list of all possible waves between Wave 1 of 1990 (represented in the dataframe by 1990-01-01 for ease of time series analysis) and Wave 6 of 2019 (2019-11-01). The results of this exploration, which informed our approach for interpolation, can be found in Table 3.
+
+```{r table3, echo = FALSE}
+datasets <- c("All fish", "Bluefish", "Black sea bass")
+numberNAs <-c(sum(is.na(fish.before.interpolate$TOT_CAT_ALL)),
+            sum(is.na(blue.before.interpolate$TOT_CAT_ALL)),
+            sum(is.na(bass.before.interpolate$TOT_CAT_ALL)))
+NA_df <- data.frame(datasets, numberNAs)
+names(NA_df) <- c("Dataset", "Number of missing values")
+
+NA_table <- kable(NA_df, caption = "Number of missing values from NOAA MRIP data") %>%
+    column_spec(1,width = "1.5in") %>%
+    column_spec(2,width = "3in") %>%
+    kable_styling(latex_options = "HOLD_position")
+NA_table
+
+```
+
+
 ```{r ggplot, echo=FALSE, message=FALSE, fig.height = 10, fig.width = 16, fig.cap = "Catch Patterns over Time"}
 fish_ggplot <- ggplot(fish.summary.interpolate, aes(x = DATE, y = TOT_CAT_ALL)) +
   geom_line() +
@@ -232,6 +254,7 @@ bass_ggplot <- ggplot(bass.summary.interpolate, aes(x = DATE, y = TOT_CAT_ALL)) 
 
 plot_grid(fish_ggplot, blue_ggplot, bass_ggplot, nrow = 3)
 ```
+
 
 \newpage
 
