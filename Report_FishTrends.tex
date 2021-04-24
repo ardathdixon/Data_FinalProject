@@ -115,6 +115,18 @@ Questions}\label{rationale-and-research-questions}}
   What could these trends look like in the future?
 \end{itemize}
 
+\begin{quote}
+\emph{Write 1-2 paragraph(s) detailing the rationale for your study.
+This should include both the context of the topic as well as a rationale
+for your choice of dataset (reason for location, variables, etc.). You
+may choose to include citations if you like (optional).}
+\end{quote}
+
+\begin{quote}
+\emph{At the end of your rationale, introduce a numbered list of your
+questions (or an overarching question and sub-questions).}
+\end{quote}
+
 \newpage
 
 \hypertarget{dataset-information}{%
@@ -133,11 +145,32 @@ download query tool
   Multiple areas and modes of fishing
 \end{itemize}
 
+\begin{quote}
+\emph{Provide information on how the dataset for this analysis were
+collected, the data contained in the dataset, and any important pieces
+of information that are relevant to your analyses. This section should
+contain much of same information as the metadata file for the dataset
+but formatted in a way that is more narrative.}
+\end{quote}
+
+\begin{quote}
+\emph{Describe how you wrangled your dataset in a format similar to a
+methods section of a journal article.}
+\end{quote}
+
+\begin{quote}
+\emph{Add a table that summarizes your data structure (variables, units,
+ranges and/or central tendencies, data source if multiple are used,
+etc.). This table can be made in markdown text or inserted as a
+\texttt{kable} function in an R chunk. If the latter, do not include the
+code used to generate your table.}
+\end{quote}
+
 \begin{table}[H]
 
 \caption{\label{tab:table1}General Information About the Data Used}
 \centering
-\begin{tabular}[t]{>{\raggedright\arraybackslash}p{1.5in}|>{\raggedright\arraybackslash}p{5in}}
+\begin{tabular}[t]{l|l}
 \hline
 Detail & Description\\
 \hline
@@ -160,13 +193,13 @@ Date Range & January 1990 - December 2019\\
 \hline
 Summary Statistics & All Fish & Bluefish & Black Sea Bass\\
 \hline
-Minimum & 11869.99 & 2.654465e+01 & 1168.843\\
+Minimum & 11869 & 26 & 1168\\
 \hline
-Mean & 12402954.90 & 1.342064e+06 & 411196.959\\
+Mean & 12402954 & 1342064 & 411196\\
 \hline
-Median & 11292146.32 & 1.064370e+06 & 313437.853\\
+Median & 11292146 & 1064369 & 313437\\
 \hline
-Maximum & 34932698.46 & 5.254125e+06 & 1746847.176\\
+Maximum & 34932698 & 5254124 & 1746847\\
 \hline
 \end{tabular}
 \end{table}
@@ -175,12 +208,14 @@ Maximum & 34932698.46 & 5.254125e+06 & 1746847.176\\
 \hypertarget{exploratory-analysis}{%
 \section{Exploratory Analysis}\label{exploratory-analysis}}
 
-\#\#code and table of number of NAs per fish category
-
-While wrangling the data, we checked the number of waves without catch
-records for each dataset by joining the existing data to a list of all
-possible waves between Wave 1 of 1990 (represented in the dataframe by
-1990-01-01 for ease of time series analysis) and Wave 6 of 2019
+We began our analysis by converting waves to months, in order to process
+the six annual waves using time series analyses. For NOAA fishing
+records, wave 1 represents January and February, wave 2 represents March
+and April, and this continues through the year. Therefore, we assigned
+wave 1 catches to the date of January 1, wave 2 catches to March 1, and
+beyond. We checked the number of waves without catch records for each
+dataset by joining the existing data to a list of all possible waves
+between Wave 1 of 1990 (represented by 1990-01-01) and Wave 6 of 2019
 (2019-11-01). The results of this exploration, which informed our
 approach for interpolation, can be found in Table 3.
 
@@ -188,7 +223,7 @@ approach for interpolation, can be found in Table 3.
 
 \caption{\label{tab:table3}Number of missing values from NOAA MRIP data}
 \centering
-\begin{tabular}[t]{>{\raggedright\arraybackslash}p{1.5in}|>{\raggedleft\arraybackslash}p{3in}}
+\begin{tabular}[t]{l|r}
 \hline
 Dataset & Number of missing values\\
 \hline
@@ -201,10 +236,19 @@ Black sea bass & 13\\
 \end{tabular}
 \end{table}
 
-\begin{figure}
-\centering
-\includegraphics{Report_FishTrends_files/figure-latex/ggplot-1.pdf}
-\caption{Catch Patterns over Time}
+To fill the gaps with no data, we interpolated the likely values of
+missing time periods. This interpolation incorporated the catch numbers
+on either side chronologically. We graphed the total catch trends over
+time (with the newly interpolated values for missing periods) as shown
+in Figure 1. With this visualization, we could compare the three
+categories' recreational fishing catch patterns: all fish, bluefish, and
+black sea bass.
+
+\begin{figure}[H]
+
+\hfill{}\includegraphics{Report_FishTrends_files/figure-latex/ggplot-1} 
+
+\caption{Total Catch Patterns over Time}\label{fig:ggplot}
 \end{figure}
 
 \newpage
@@ -217,23 +261,65 @@ Black sea bass & 13\\
 caught over time? How do they
 compare?}\label{question-1-are-there-trends-in-the-amount-of-these-fish-caught-over-time-how-do-they-compare}}
 
-\includegraphics{Report_FishTrends_files/figure-latex/unnamed-chunk-1-1.pdf}
+\#\#Annie, certainly feel free to restructure these figures etc. as fits
+with the text. I (Ardath) consolidated the p-values into a table to try
+\& help make it visualize more clearly, too! I put the 3 tests into one
+chunk, but/and we can rearrange \& smooth it out together on Sun, too.
 
-\begin{verbatim}
-## tau = 0.49, 2-sided pvalue =< 2.22e-16
-\end{verbatim}
+\begin{quote}
+\emph{Insert visualizations and text describing your main analyses.
+Format your R chunks so that graphs are displayed but code and other
+output is not displayed. Instead, describe the results of any
+statistical tests in the main text (e.g., ``Variable x was significantly
+different among y groups (ANOVA; df = 300, F = 5.55, p \textless{}
+0.0001)''). Each paragraph, accompanied by one or more visualizations,
+should describe the major findings and how they relate to the question
+and hypotheses. Divide this section into subsections, one for each
+research question.}
+\end{quote}
 
-\includegraphics{Report_FishTrends_files/figure-latex/unnamed-chunk-3-1.pdf}
+\begin{quote}
+\emph{Each figure should be accompanied by a caption, and each figure
+should be referenced within the text}
+\end{quote}
 
-\begin{verbatim}
-## tau = 0.324, 2-sided pvalue =8.7489e-10
-\end{verbatim}
+\begin{figure}[H]
 
-\includegraphics{Report_FishTrends_files/figure-latex/unnamed-chunk-5-1.pdf}
+\hfill{}\includegraphics{Report_FishTrends_files/figure-latex/All Fish Trends-1} 
 
-\begin{verbatim}
-## tau = 0.41, 2-sided pvalue =8.4377e-15
-\end{verbatim}
+\caption{Seasonal and Trend Decomposition for All Fish Total Catch}\label{fig:All Fish Trends}
+\end{figure}
+
+\begin{figure}[H]
+
+\hfill{}\includegraphics{Report_FishTrends_files/figure-latex/Bluefish Trends-1} 
+
+\caption{Seasonal and Trend Decomposition for Bluefish Total Catch}\label{fig:Bluefish Trends}
+\end{figure}
+
+\begin{figure}[H]
+
+\hfill{}\includegraphics{Report_FishTrends_files/figure-latex/Black Sea Bass Trends-1} 
+
+\caption{Seasonal and Trend Decomposition for Black Sea Bass Total Catch}\label{fig:Black Sea Bass Trends}
+\end{figure}
+
+\begin{table}[H]
+
+\caption{\label{tab:table4}Seasonal Mann Kendall Tests}
+\centering
+\begin{tabular}[t]{l|r|l}
+\hline
+Fish Category & tau & 2-Sided P-value\\
+\hline
+All Fish & 0.4896552 & 0.000000e+00\\
+\hline
+Bluefish & 0.3235180 & 8.748902e-10\\
+\hline
+Black Sea Bass & 0.4095312 & 8.437695e-15\\
+\hline
+\end{tabular}
+\end{table}
 
 For both individual species and all species combined, \textbf{reject the
 null hypothesis} that there is no trend.
@@ -242,23 +328,38 @@ null hypothesis} that there is no trend.
 \subsection{Question 2: What could these trends look like in the
 future?}\label{question-2-what-could-these-trends-look-like-in-the-future}}
 
-\includegraphics{Report_FishTrends_files/figure-latex/unnamed-chunk-7-1.pdf}
+\begin{flushright}\includegraphics{Report_FishTrends_files/figure-latex/unnamed-chunk-1-1} \end{flushright}
 
 \newpage
 
 \hypertarget{summary-and-conclusions}{%
 \section{Summary and Conclusions}\label{summary-and-conclusions}}
 
+\begin{quote}
+\emph{Summarize your major findings from your analyses in a few
+paragraphs. What conclusions do you draw from your findings? Relate your
+findings back to the original research questions and rationale.}
+\end{quote}
+
 \hypertarget{strong-seasonal-trends}{%
 \subsection{Strong seasonal trends}\label{strong-seasonal-trends}}
 
-\begin{itemize}
-\tightlist
-\item
-  Bimodal peaks for bluefish
-\item
-  Possibly due to effort, fish abundance
-\end{itemize}
+NOAA marine recreational fishing catch totals for North Carolina show
+strong seasonal trends. Many more fish are caught in the summer, and
+much fewer fish are caught in the winter, as demonstrated above (Figure
+1). The high seasonality for all three datasets analyzed was confirmed
+with the Seasonal Mann Kendall Tests, where all three P-values
+\textless{} 0.05 (Table 4).
+
+This seasonality is likely influenced by recreational fishing patterns,
+where fishers are more likely to fish in the warm summer weather than
+the cool winter weather. Another potential cause for the seasonal trends
+is fish abundance and migration patterns, with higher populations of
+fish in North Carolina waters during the summer than during the winter.
+Total catch trends for all fish and Black Sea Bass showed unimodal peaks
+and valleys overall, while Bluefish showed bimodal trends (Figure 1).
+These bimodal Bluefish peaks could be due to their seasonal migration
+patterns (\href{http://www.asmfc.org/species/bluefish}{ASMFC 2021}).
 
 \hypertarget{overall-positive-trend}{%
 \subsection{Overall positive trend}\label{overall-positive-trend}}
