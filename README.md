@@ -16,6 +16,6 @@ We completed time series analysis for fishing trends in North Carolina. Specific
   
 **Black Sea Bass**: FROM 1990 TO 2019, DATA TYPE = "ESTIMATE: CATCH", WAVE OPTIONS = "ALL WAVES", GEOGRAPHICAL AREA STATE/AREA = "NORTH CAROLINA", SPECIES = "BLACK SEA BASS" (Selection tool), OUTPUT FORM = "DOWNLOAD CSV AS ZIP FILE".  
   
-## GitHUb Repository  
+## GitHub Repository  
   
 All data and code for this project can be retrieved from the GitHub repository at this link: https://github.com/ardathdixon/Data_FinalProject
