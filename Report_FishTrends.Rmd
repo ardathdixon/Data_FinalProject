@@ -56,11 +56,14 @@ bass.dat <- read.csv("../Data_FinalProject/Data/Raw/BSB_mrip_estim_catch_wave_19
 
 # Rationale and Research Questions
 
-- Are there trends in the amount of these fish caught over time? How do they compare?
+As public awareness of increasing strains on ocean resources and organisms (e.g. see the reach of films such as Seaspiracy and Sonic Sea), more attention is being placed on understanding fishing patterns and the impacts they have on the oceans. Most of this attention is placed on commercial and industrial fishing operations, which are studied and managed by the federal agency NOAA, or the National Oceaninc and Atmospheric Administration. However, there are fewer studies on recreational fishing, which NOAA also aids in overseeing and collects data for. For this study, we chose to investigate recreational fishing trends in North Carolina over a twenty-year period. The data, whose origins are discussed more below, initially included 27 variables, detailing information such as mode of fishing and wave (time period) the data was caught in. For this analysis, we wanted to look specifically at total catch during each wave, as we were running time series analyses during hte course of the project. Therefore, we focused on only one catch estimation variable: total catch. We chose North Carolina due to our familiarity with species here, and we chose two popular recreational fishing species to investigate alongside all species combined. Trends in recreational fishing data can give us information about human behavior, species populations, and species patterns, which is why we found this topic interesting and wanted to investigate it further. We chose the following questions to guide our work:
 
-- What could these trends look like in the future?
+1. Are there trends in the amount of these fish caught over time? How do they compare?
+
+2. What could these trends look like in the future?
 
 >*Write 1-2 paragraph(s) detailing the rationale for your study. This should include both the context of the topic as well as a rationale for your choice of dataset (reason for location, variables, etc.). You may choose to include citations if you like (optional).*
+ 
 
 >*At the end of your rationale, introduce a numbered list of your questions (or an overarching question and sub-questions).* 
 
@@ -73,7 +76,7 @@ bass.dat <- read.csv("../Data_FinalProject/Data/Raw/BSB_mrip_estim_catch_wave_19
 
 ### Data Retrieval:
 
-FOr this analysis, we used data collected during Marine Recreational Information Program (MRIP) surveys collected by the National Oceanic and Atmospheric Administration (NOAA). We retrieved the data using the NOAA Recreational Fisheries Statistics Queries “download query” tool (found at https://www.fisheries.noaa.gov/data-tools/recreational-fisheries-statistics-queries). We created three separate queries to download data: one for all species, one for bluefish (*Pomatomus saltatrix*), and one for black sea bass (*Centropristis striata*). For each query, we used the date range 1990-2019 and requested catch estimate data by "wave", or two-month period, for all waves, fishing modes, and areas of fishing for the state of North Carolina. We downloaded the CSVs as ZIP files and added them to our project repository.
+For this analysis, we used data collected during Marine Recreational Information Program (MRIP) surveys collected by the National Oceanic and Atmospheric Administration (NOAA). We retrieved the data using the NOAA Recreational Fisheries Statistics Queries “download query” tool (found at https://www.fisheries.noaa.gov/data-tools/recreational-fisheries-statistics-queries). We created three separate queries to download data: one for all species, one for bluefish (*Pomatomus saltatrix*), and one for black sea bass (*Centropristis striata*). For each query, we used the date range 1990-2019 and requested catch estimate data by "wave", or two-month period, for all waves, fishing modes, and areas of fishing for the state of North Carolina. We downloaded the CSVs as ZIP files and added them to our project repository.
 
 All data and code for this project can be retrieved from the GitHub repository at this link: https://github.com/ardathdixon/Data_FinalProject
 
@@ -351,6 +354,8 @@ The strengths of these trends vary; catch for all fish has the strongest trend w
 
 ## Question 2: What could these trends look like in the future?
 
+To investigate future trends, we used forecasting in R to predict future data based on the existing past data we pulled from NOAA. There are several different methods through which to forecast, though only some of them account for seasonality, which was necessary here due to the seasonal components found in all three of our time series. We chose to use the Holt-Winters forecasting method for this data. Holt-Winters is more complex than simpler methods like naive but requires knowledge of fewer additional variables that other models, like SARIMA, need in order to run. Holt-Winters uses smooth exponentiating and varying weights of past data - with more recent data weighed more - to predict future data. Here, we predicted five years of data (where h = number of periods, and each period = 2 months). In the resulting plots, the dark purple area represents the 80% confidence interval level for predicted data, while the light purple area represents the 95% confidence interval level. 
+
 ```{r, echo=FALSE, fig.height = 5, fig.width = 6}
 holtsfish <- HoltWinters(fish.summary.interpolate.ts)
 fish.predict.HW <- forecast(holtsfish, h=30, findfrequency = TRUE)
@@ -369,9 +374,11 @@ bass.predict.plot <- autoplot(bass.predict.HW,
 
 plot_grid(fish.predict.plot, blue.predict.plot, bass.predict.plot, nrow = 3)
 
-#forecasting: note that Holt Winters weighs more recent data more heavily than older data (e.g. bluefish total trend is positive but forecasted trend looks negative) and predicts data without much noise in it, which is unlikely to be the case IRL. Useful visualization but inaccurate bc of complexities in fishing data. (could go above w forecasting slides)
-
 ```
+
+The Holt-Winters plots all show clear continued seasonality patterns and trends. For Black Sea Bass and all species combined, overall future trends are expected to be positive, like the past trends. For Bluefish, the forecasted trend is slightly negative -- this is likely because the most recent years of bluefish data do show a slight negative slope, even though the trend is positive for the full twenty years in the dataset (though as noted above, bluefish has the smallest tau, and therefore the weakest trend). These forecasting plots are useful visualizations but should not be considered fully accurate because of these inherent complexities in fishing catch data that models like Holt-Winters cannot account for. 
+ 
+
 
 
 \newpage
@@ -402,9 +409,13 @@ Although the trend was generally positive for all three time series, it was not 
 <br />
 
 ## Limitations
-+ Data collection: Estimates based on surveys of fishers 
-+ Interpolation
-+ Uncertainty in forecasting
+
+The MRIP system works very well for its intended purposes, but it is ultimately still a system based on estimation. Through MRIP, NOAA interviews only some fishers, then uses mathematical modeling to extrapolate on this collected survey data in order to create statewide (or area-wide, depending on the dataset) estimates. While MRIP is the best source of recreational fishing catch data, there is always room for some error in its estimations. 
+
+Within each of our datasets, there were some missing values. These values were not side by side or frequent, so we chose to linearly (*?*) interpolate our data in order to fill them in. This helped our figures and analyses (e.g. Mann-Kendall) to appear and run cleaner, but interpolating has some drawbacks. While interpolations seemed to follow the clear seasonal pattern in each dataset, most often the interpolated data was in wave periods that were minimums in other years of the datasets, so our interpolated values may have been a bit higher than actual catch rates during those times. Interpolation is an estimator for missing data, and it is important to acknowledge that our interpolated data may not be representative of true values.  
+
+Finally, our forecasted data are much cleaner and less noisy than our existing data. Noise in these datasets comes from external factors like changes in fish catch limits or weather patterns, which this forecasting method cannot take into account or predict. Our forecasting outputs are therefore limited by the relatively simple methodology we chose to employ. Holt-Winters remains a popular forecasting method and is reasonable to use for our purposes here, but the inherent uncertainty in this predicted data is important to acknowledge. 
+
 
 <br />
 
