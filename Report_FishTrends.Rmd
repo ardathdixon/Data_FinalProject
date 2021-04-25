@@ -71,13 +71,12 @@ bass.dat <- read.csv("../Data_FinalProject/Data/Raw/BSB_mrip_estim_catch_wave_19
 # Dataset Information
 <br />
 
-Data retrieved from NOAA Marine Recreational Information Program download query tool
+### Data Retrieval:
 
-- Bimonthly recreational fisheries catch totals for NC, 1990-2019
+FOr this analysis, we used data collected during Marine Recreational Information Program (MRIP) surveys collected by the National Oceanic and Atmospheric Administration (NOAA). We retrieved the data using the NOAA Recreational Fisheries Statistics Queries “download query” tool (found at https://www.fisheries.noaa.gov/data-tools/recreational-fisheries-statistics-queries). We created three separate queries to download data: one for all species, one for bluefish (*Pomatomus saltatrix*), and one for black sea bass (*Centropristis striata*). For each query, we used the date range 1990-2019 and requested catch estimate data by "wave", or two-month period, for all waves, fishing modes, and areas of fishing for the state of North Carolina. We downloaded the CSVs as ZIP files and added them to our project repository.
 
-- All species, bluefish (*Pomatomus saltatrix*), and black sea bass (*Centropristis striata*) 
+All data and code for this project can be retrieved from the GitHub repository at this link: https://github.com/ardathdixon/Data_FinalProject
 
-- Multiple areas and modes of fishing  
 
 >*Provide information on how the dataset for this analysis were collected, the data contained in the dataset, and any important pieces of information that are relevant to your analyses. This section should contain much of same information as the metadata file for the dataset but formatted in a way that is more narrative.*
 
@@ -268,8 +267,11 @@ plot_grid(fish_ggplot, blue_ggplot, bass_ggplot, nrow = 3)
 
 ## Question 1: Are there trends in the amount of these fish caught over time? How do they compare?
 
-##Annie, certainly feel free to restructure these figures etc. as fits with the text. I (Ardath) consolidated the p-values into a table to try & help make it visualize more clearly, too! I put the 3 tests into one chunk, but/and we can rearrange & smooth it out together on Sun, too.
-
+##Annie, certainly feel free to restructure these figures etc. as fits with the text. I (Ardath) consolidated the p-values into a table to try & help make it visualize more clearly, too! I put the 3 tests into one chunk, but/and we can rearrange & smooth it out together on Sun, too.  
+  
+  
+After our exploratory analysis and interpolation of the missing data points for each dataset, we created three time series for further analysis. We investigated the trends in total catch for all fish (Figure 2), bluefish (Figure 3), and black sea bass (Figure 4) by decomposing the time series into their seasonal, trend, and remainder components. For all three time series, we observed a strong seasonal trend, with low catch totals in the winter and high catch totals in the summer. Furthermore, each trend component showed an apparent increase in total catch over time.  
+  
 >*Insert visualizations and text describing your main analyses. Format your R chunks so that graphs are displayed but code and other output is not displayed. Instead, describe the results of any statistical tests in the main text (e.g., "Variable x was significantly different among y groups (ANOVA; df = 300, F = 5.55, p < 0.0001)"). Each paragraph, accompanied by one or more visualizations, should describe the major findings and how they relate to the question and hypotheses. Divide this section into subsections, one for each research question.*
 
 >*Each figure should be accompanied by a caption, and each figure should be referenced within the text*
@@ -340,7 +342,12 @@ trends_table <- kable(trends_df, caption = "Seasonal Mann Kendall Tests") %>%
     kable_styling(latex_options = "HOLD_position")
 trends_table
 ```
-For both individual species and all species combined, **reject the null hypothesis** that there is no trend.
+  
+  
+We ran a Seasonal Mann-Kendall test on each time series to test whether there was a monotonic trend in the total number of fish caught over time (Table 4). All three tests returned a statistically significant result (All fish: tau = 0.49, p < 2.22 x 10^-16; bluefish: tau = 0.32, p = 8.75 x 10^-10; black sea bass: tau = 0.41, p = 8.44 x 10^-15). Therefore, for all three time series, we reject the null hypothesis that there is no monotonic trend in favor of the alternative hypothesis that there is a trend in the data over time.  
+  
+The strengths of these trends vary; catch for all fish has the strongest trend while bluefish has the weakest trend. Nonetheless, catch for both individual species and all species combined increases over the span of the data, between the beginning of 1990 and the end of 2019.
+
 
 ## Question 2: What could these trends look like in the future?
 
@@ -383,9 +390,14 @@ This seasonality is likely influenced by recreational fishing patterns, where fi
 
 <br />
 
-## Overall positive trend
-+ Increase in recreational fishing
-+ Variation from changing regulations, behavior
+## Overall positive trend  
+  
+There was an increase in total catch of bluefish, black sea bass, and all species combined over time. The driver of this increase in recreational fishery landings is unknown, but it could be attributed to increased fishing effort, with more fishers participating in recreational fishing, or a change in methods or regulations that resulted in individual fishers catching more fish. 
+
+  ##I think it would be beneficial to add some references in this section – working on this! - Annie  
+
+Although the trend was generally positive for all three time series, it was not uniform; in other words, the rate of change varied over time, and there were brief periods where catch plateaued or decreased. This variation could be caused by changes in recreational fishing regulations over time, such as the increase or decrease of catch limits and size limits, or temporary area closures. Furthermore, recreational fishing is subject to all of the myriad factors that can influence behavior, including but not limited to climate variation and current events. In a recent example of how current events could impact recreational fishing that is beyond the scope of our analysis, which extended only to the end of 2019, the COVID-19 pandemic could have either increased recreational fishing in 2020, when people were spending more time outside, or decreased recreational fishing, as people were less able to travel to the coast.
+
 
 <br />
 
