@@ -346,7 +346,7 @@ The strengths of these trends vary; based on tau values, catch for all fish has 
 
 ## Question 2: What could these trends look like in the future?
 
-To investigate future trends, we used forecasting in R to predict future data based on the existing past data we pulled from NOAA. There are several different methods through which to forecast, though only some of them account for seasonality, which was necessary here due to the seasonal components found in all three of our time series. We chose to use the Holt-Winters forecasting method for this data. Holt-Winters is more complex than simpler methods like naive forecasting, but it requires knowledge of fewer additional variables that other models, like SARIMA, need in order to run. Holt-Winters uses smooth exponentiating and varying weights of past data - with more recent data weighed more - to predict future data. Here, we predicted five years of data (where h = number of periods, and each period = 2 months). In the resulting plots, the dark blue area represents the 80% confidence interval level for predicted data, while the light blue area represents the 95% confidence interval level. 
+To investigate future trends, we used forecasting in R to predict future data based on the existing past data we pulled from NOAA. There are several different methods through which to forecast, though only some of them account for seasonality, which was necessary here due to the seasonal components found in all three of our time series. We chose to use the Holt-Winters forecasting method for this data. Holt-Winters is more complex than simpler methods like naive forecasting, but it requires knowledge of fewer additional input variables that other models, like SARIMA, need in order to run. Holt-Winters uses smooth exponentiating and varying weights of past data - with more recent data weighed more - to predict future data. Here, we predicted five years of data (where h = number of periods, and each period = two months). In the resulting plots, the dark blue area represents the 80% confidence interval level for predicted data, while the light blue area represents the 95% confidence interval level. 
 
 ```{r, echo=FALSE, fig.height = 5, fig.width = 6, fig.cap = "Holt-Winters Catch Forecasts"}
 holtsfish <- HoltWinters(fish.summary.interpolate.ts)
@@ -368,14 +368,12 @@ plot_grid(fish.predict.plot, blue.predict.plot, bass.predict.plot, nrow = 3)
 
 ```
 
-The Holt-Winters plots (Figure 5) all show clear continued seasonal patterns and trends. For black sea bass and all species combined, overall future trends are expected to be positive, like the past trends. For bluefish, the forecasted trend is slightly negative -- this is likely because the most recent years of bluefish data do show a slight negative slope, even though the trend is positive for the full thirty years in the dataset (though as noted above, bluefish has the smallest tau, and therefore the weakest trend). These forecasting plots are useful visualizations but should not be considered fully accurate because of these inherent complexities in fishing catch data that models like Holt-Winters cannot account for. 
+The Holt-Winters plots (Figure 5) all show clear continued seasonal patterns and trends. For black sea bass and all species combined, overall future trends are expected to be positive, like the past trends. For bluefish, the forecasted trend is slightly negative -- this is likely because the most recent years of bluefish data do show a slight negative slope, even though the trend is positive for the full thirty years in the dataset (though as noted above, bluefish has the smallest tau, and therefore the weakest trend). These forecasting plots are useful visualizations but should not be considered fully accurate because of the inherent complexities in fishing catch data that models like Holt-Winters cannot account for. 
  
 
 \newpage
 
 # Summary and Conclusions
-
->*Summarize your major findings from your analyses in a few paragraphs. What conclusions do you draw from your findings? Relate your findings back to the original research questions and rationale.*
 
 <br />
 
@@ -389,8 +387,6 @@ NOAA marine recreational fishing catch totals for North Carolina show strong sea
   
 There was an increase in total catch of bluefish, black sea bass, and all species combined over time. The driver of this increase in recreational fishery landings is unknown, but it could be attributed to increased fishing effort, with more fishers participating in recreational fishing or individual fishers catching more fish. 
 
-  ##I think it would be beneficial to add some references in this section – working on this! - Annie  
-
 Although the trend was generally positive for all three time series, it was not uniform; in other words, the rate of change varied over time, and there were brief periods where catch plateaued or decreased. This variation could be caused by changes in recreational fishing regulations over time, such as the increase or decrease of catch limits and size limits, or temporary area closures. Furthermore, recreational fishing is subject to the myriad of factors that can influence human behavior, including but not limited to climate variation (Dundas & von Haefen 2020) and events with an environmental impact such as hurricanes (Smee et al. 2020) or the Deepwater Horizon Oil Spill (Alvarez et al. 2014). In a recent example of how other current events could impact recreational fishing that is beyond the scope of our analysis extending only to the end of 2019, the COVID-19 pandemic could have either increased recreational fishing in 2020, when people were spending more time outside, or decreased recreational fishing, as people were less able to travel to the coast.
 
 
@@ -402,14 +398,14 @@ The MRIP system works very well for its intended purposes, but it is ultimately 
 
 Within each of our datasets, there were some missing values. These values were not side by side or frequent, so we chose to linearly interpolate our data in order to fill them in. This helped our figures and analyses (e.g. seasonal Mann-Kendall) to appear and run cleaner, but interpolating has some drawbacks. While interpolations seemed to follow the clear seasonal pattern in each dataset, most often the interpolated data was in wave periods that were minimums in other years of the datasets, so our interpolated values may have been a bit higher than actual catch rates during those times. Interpolation is an estimator for missing data, and it is important to acknowledge that our interpolated data may not be representative of true values.  
 
-Finally, our forecasted data are much cleaner and less noisy than our existing data. Noise in these datasets comes from external factors like changes in fish catch limits or weather patterns, which this forecasting method can neither take into account nor predict. Our forecasting outputs are therefore limited by the relatively simple methodology we chose to employ. Holt-Winters remains a popular forecasting method and is reasonable to use for our purposes here, but the inherent uncertainty in this predicted data is important to acknowledge. 
+Finally, our forecasted data are much cleaner and less noisy than our existing data (see Figure 5). Noise in these datasets comes from external factors like changes in fish catch limits or weather patterns, which this forecasting method can neither take into account nor predict. Our forecasting outputs are therefore limited by the relatively simple methodology we chose to employ. Holt-Winters remains a popular forecasting method and is reasonable to use for our purposes here, but the inherent uncertainty in this predicted data is also important to acknowledge. 
 
 
 <br />
 
 ## Future recommendations
 
-Future research could extend our analysis to include a greater scope regarding specific species, areas, and timelines. NOAA provides catch data for an extensive number of fish species, and therefore time-series and forecasting analysis could also be applied to other species of interest. Likewise, the widespread area available for NOAA catch data means that future research could translate our analysis toward catch numbers from other states. Additionally, the available data goes beyond the timeline we analyzed, dating back to 1981. Future analysis could adjust variables of interest accordingly thanks to the vast NOAA data available for public access. 
+Future research could extend our analysis to include a greater scope regarding specific species, areas, and timelines. NOAA provides catch data for an extensive number of fish species, and therefore time-series and forecasting analyses could also be applied to other species of interest. Likewise, the widespread area available for NOAA catch data means that future research could translate our analysis toward catch numbers from other states. Additionally, the available data goes beyond the timeline we analyzed, dating back to 1981. Future analysis could adjust variables of interest accordingly thanks to the vast NOAA data available for public access. 
 
 In addition to adjusting the sample for analysis, future research could compare changes of catch per unit of effort over time. Analyzing total catch does not incorporate the number of fishers or success rates. Incorporating the catch per unit of effort could reveal possible causes of the increasing catch trends over time (e.g. more fishers in total or more efficient fishers).
 
