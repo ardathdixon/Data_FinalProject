@@ -114,22 +114,23 @@ patterns and the impacts they have on the oceans. Most of this attention
 is placed on commercial and industrial fishing operations, which are
 studied and managed by the federal agency NOAA, the National Oceanic and
 Atmospheric Administration. However, there are fewer studies on
-recreational fishing, for which NOAA also aids in overseeing and
-collects data.
+recreational fishing, for which NOAA also collects data and aids in
+overseeing.
 
 For this study, we chose to investigate recreational fishing trends in
 North Carolina over a thirty-year period. The data, whose origins are
 discussed more below, initially included 27 variables, detailing
-information such as mode of fishing and wave (2-month time period) the
-data was caught in. For this analysis, we wanted to look specifically at
-total catch during each wave, as we were running time series analyses
-during the course of the project. Therefore, we focused on only one
-catch estimation variable: total catch. We chose North Carolina due to
-our familiarity with species here, and we chose two popular recreational
-fishing species to investigate alongside all species combined. Trends in
-recreational fishing data can give us information about human behavior,
-species populations, and species movement patterns, which is why we
-found this topic interesting and wanted to investigate it further.
+information such as mode of fishing and wave (2-month time period) in
+which the fish were caught. For this analysis, we wanted to look
+specifically at total catch during each wave, as we were running time
+series analyses during the course of the project. Therefore, we focused
+on only one catch estimation variable: total catch. We chose North
+Carolina due to our familiarity with species here, and we chose two
+popular recreational fishing species to investigate alongside all
+species combined. Trends in recreational fishing data can give us
+information about human behavior, species populations, and species
+movement patterns, which is why we found this topic interesting and
+wanted to investigate it further.
 
 We chose the following questions to guide our work:
 
@@ -199,7 +200,7 @@ the six annual waves using time series analysis. For NOAA fishing
 records, wave 1 represents January and February, wave 2 represents March
 and April, and this continues through the year. Therefore, we assigned
 wave 1 catches to the date of January 1, wave 2 catches to March 1, and
-beyond.
+so forth.
 
 After applying the custom wave-to-month function to the data, we created
 a date variable to capture year and month together (the day value for
@@ -219,7 +220,7 @@ described below.
 \centering
 \begin{tabular}[t]{l|r|r|r}
 \hline
-Summary Statistics & All Fish & Bluefish & Black Sea Bass\\
+Summary Statistic & All Fish & Bluefish & Black Sea Bass\\
 \hline
 Minimum & 11869 & 26 & 1168\\
 \hline
@@ -260,15 +261,17 @@ Black sea bass & 13\\
 \end{tabular}
 \end{table}
 
-To fill the gaps with no data, we interpolated the likely values of
-missing time periods. This linear interpolation incorporated the catch
-numbers on either side chronologically. If wave 1 of 1990 or wave 6 of
-2019 was missing, we did not interpolate the value, as there would not
-be a measurement available on both sides. We graphed the total catch
-trends over time (with the newly interpolated values for missing
-periods) as shown in Figure 1. With this visualization, we could compare
-the three categories' recreational fishing catch patterns: all fish,
-bluefish, and black sea bass.
+There were relatively few missing catch totals, and no more than one
+consecutive data point was missing in a row. To fill the gaps with no
+data, we used linear interpolation to estimate the likely values of
+missing time periods. This interpolation incorporated the catch numbers
+on either side of the missing value chronologically. If wave 1 of 1990
+or wave 6 of 2019 was missing, we did not interpolate the value, as
+there would not be a measurement available on both sides. We graphed the
+total catch trends over time (with the newly interpolated values for
+missing periods) as shown in Figure 1. With this visualization, we could
+compare the three categories' recreational fishing catch patterns: all
+fish, bluefish, and black sea bass.
 
 \begin{figure}[H]
 
@@ -287,12 +290,12 @@ bluefish, and black sea bass.
 caught over time? How do they
 compare?}\label{question-1-are-there-trends-in-the-amount-of-these-fish-caught-over-time-how-do-they-compare}}
 
-After our exploratory analysis and interpolation of the missing data
-points for each dataset, we created three time series for further
-analysis. We investigated the trends in total catch for all fish (Figure
-2), bluefish (Figure 3), and black sea bass (Figure 4) by decomposing
-the time series into their seasonal, trend, and remainder components.
-For all three time series, we observed a strong seasonal trend with low
+After our interpolation of the missing data points for each dataset and
+exploratory analysis, we created three time series for further analysis.
+We investigated the trends in total catch for all fish (Figure 2),
+bluefish (Figure 3), and black sea bass (Figure 4) by decomposing the
+time series into their seasonal, trend, and remainder components. For
+all three time series, we observed a strong seasonal trend with low
 catch totals in the winter and high catch totals in the summer.
 Furthermore, each trend component showed an apparent increase in total
 catch over time.
@@ -423,15 +426,16 @@ unimodal peaks and valleys overall, while bluefish showed bimodal trends
 migration patterns (\href{http://www.asmfc.org/species/bluefish}{ASMFC
 2021}). Another possible explanation for their bimodal trends is that
 bluefish in the northern Atlantic Ocean spawn twice annually, once in
-the spring and once in the summer (Arthur \& Walford 1979).
+the spring and once in the summer, and more fish may be caught during
+spawning aggregations (Arthur \& Walford 1979).
 
 \hypertarget{overall-positive-trend}{%
 \subsection{Overall positive trend}\label{overall-positive-trend}}
 
 There was an increase in total catch of bluefish, black sea bass, and
-all species combined over time. The driver of this increase in
+all species combined over time. The main driver of this increase in
 recreational fishery landings is unknown, but it could be attributed to
-increased fishing effort, with more fishers participating in
+increased fishing effort, with either more fishers participating in
 recreational fishing or individual fishers catching more fish.
 
 Although the trend was generally positive for all three time series, it
@@ -445,11 +449,13 @@ including but not limited to climate variation (Dundas \& von Haefen
 2020) and events with an environmental impact such as hurricanes (Smee
 et al.~2020) or the Deepwater Horizon Oil Spill (Alvarez et al.~2014).
 In a recent example of how other current events could impact
-recreational fishing that is beyond the scope of our analysis extending
-only to the end of 2019, the COVID-19 pandemic could have either
-increased recreational fishing in 2020, when people were spending more
-time outside, or decreased recreational fishing, as people were less
-able to travel to the coast.
+recreational fishing, the COVID-19 pandemic could have either increased
+recreational fishing in 2020, when people were spending more time
+outside, or decreased recreational fishing, as people were less able to
+travel to the coast. This example is beyond the scope of our analysis,
+which extends only to the end of 2019, but it demonstrates the
+complexity of understanding and predicting patterns in recreational
+fishing.
 
 \hypertarget{limitations}{%
 \subsection{Limitations}\label{limitations}}
