@@ -56,7 +56,11 @@ bass.dat <- read.csv("../Data_FinalProject/Data/Raw/BSB_mrip_estim_catch_wave_19
 
 # Rationale and Research Questions
 
-As public awareness of increasing strains on ocean resources and organisms grows (e.g. see the reach of films such as Seaspiracy and Sonic Sea), more attention is being placed on understanding fishing patterns and the impacts they have on the oceans. Most of this attention is placed on commercial and industrial fishing operations, which are studied and managed by the federal agency NOAA, or the National Oceanic and Atmospheric Administration. However, there are fewer studies on recreational fishing, for which NOAA also aids in overseeing and collects data. For this study, we chose to investigate recreational fishing trends in North Carolina over a thirty-year period. The data, whose origins are discussed more below, initially included 27 variables, detailing information such as mode of fishing and wave (2-month time period) the data was caught in. For this analysis, we wanted to look specifically at total catch during each wave, as we were running time series analyses during the course of the project. Therefore, we focused on only one catch estimation variable: total catch. We chose North Carolina due to our familiarity with species here, and we chose two popular recreational fishing species to investigate alongside all species combined. Trends in recreational fishing data can give us information about human behavior, species populations, and species movement patterns, which is why we found this topic interesting and wanted to investigate it further. We chose the following questions to guide our work:
+As public awareness of increasing strains on ocean resources and organisms grows (e.g. see the reach of films such as Seaspiracy and Sonic Sea), more attention is being placed on understanding fishing patterns and the impacts they have on the oceans. Most of this attention is placed on commercial and industrial fishing operations, which are studied and managed by the federal agency NOAA, the National Oceanic and Atmospheric Administration. However, there are fewer studies on recreational fishing, for which NOAA also aids in overseeing and collects data.     
+
+For this study, we chose to investigate recreational fishing trends in North Carolina over a thirty-year period. The data, whose origins are discussed more below, initially included 27 variables, detailing information such as mode of fishing and wave (2-month time period) the data was caught in. For this analysis, we wanted to look specifically at total catch during each wave, as we were running time series analyses during the course of the project. Therefore, we focused on only one catch estimation variable: total catch. We chose North Carolina due to our familiarity with species here, and we chose two popular recreational fishing species to investigate alongside all species combined. Trends in recreational fishing data can give us information about human behavior, species populations, and species movement patterns, which is why we found this topic interesting and wanted to investigate it further.   
+
+We chose the following questions to guide our work:
 
 1. Are there trends in the amount of these fish caught over time? How do they compare?
 
@@ -70,17 +74,8 @@ As public awareness of increasing strains on ocean resources and organisms grows
 
 ## Data Retrieval:
 
-For this analysis, we used data collected during Marine Recreational Information Program (MRIP) surveys conducted by NOAA ([**NOAA n.d.**](https://www.fisheries.noaa.gov/recreational-fishing-data/about-marine-recreational-information-program)). NOAA works with state and local partners to collect information on the species and number of fish caught by fishers via in-person communication, telephone surveys, and mail-in surveys. We retrieved the data using the NOAA Recreational Fisheries Statistics Queries “download query” tool (found [**here**](https://www.fisheries.noaa.gov/data-tools/recreational-fisheries-statistics-queries)). We created three separate queries to download data: one for all species, one for bluefish (*Pomatomus saltatrix*), and one for black sea bass (*Centropristis striata*). For each query, we used the date range 1990-2019 and requested catch estimate data by "wave", or two-month period, for all waves, fishing modes, and areas of fishing for the state of North Carolina. We downloaded the CSVs as ZIP files and added them to our project repository.
-
-All data and code for this project can be retrieved from the [**GitHub repository**](https://github.com/ardathdixon/Data_FinalProject). 
+For this analysis, we used data collected during Marine Recreational Information Program (MRIP) surveys conducted by NOAA ([**NOAA n.d.**](https://www.fisheries.noaa.gov/recreational-fishing-data/about-marine-recreational-information-program)). NOAA works with state and local partners to collect information on the species and number of fish caught by fishers via in-person communication, telephone surveys, and mail-in surveys. We retrieved the data using the NOAA Recreational Fisheries Statistics Queries “download query” tool (found [**here**](https://www.fisheries.noaa.gov/data-tools/recreational-fisheries-statistics-queries)). We created three separate queries to download data: one for all species, one for bluefish (*Pomatomus saltatrix*), and one for black sea bass (*Centropristis striata*). For each query, we used the date range 1990-2019 and requested catch estimate data by "wave", or two-month period, for all waves, fishing modes, and areas of fishing for the state of North Carolina (Table 1). We downloaded the CSVs as ZIP files and added them to our project repository. All data and code for this project can be retrieved from the [**GitHub repository**](https://github.com/ardathdixon/Data_FinalProject). 
   
-## Data Wrangling:  
-  
-We began our analysis by selecting the following columns from the raw data CSV files: Year, Wave, Mode, Area, and Total Catch. Next, we created a custom function to convert waves to months in order to process the six annual waves using time series analysis. For NOAA fishing records, wave 1 represents January and February, wave 2 represents March and April, and this continues through the year. Therefore, we assigned wave 1 catches to the date of January 1, wave 2 catches to March 1, and beyond.
-
-After applying the custom wave-to-month function to the data, we created a date variable to capture year and month together (the day value for each of these dates was 01). Next, we used a split-apply-combine approach to find the sum of total catch for each wave. Each of these sums contains the catch from all unique combinations of fishing mode and area that were recorded during a given wave. Finally, to create the time series, we selected only the columns for date (DATE) and the sum of total catch (TOT_CAT_ALL). We then proceeded to exploratory analysis and interpolation of missing data points, which are described below.
-
-
 ```{r table1, echo = FALSE}
 names <- c("Data Source", "Retrieved from", "Variables Used", "Date Range")
 details <-c("NOAA MRIP", "https://www.fisheries.noaa.gov/data-tools/recreational-fisheries-statistics-queries", "Year, Wave, Total Catch (Number of fish), Mode, Area", "January 1990 - December 2019")
@@ -88,9 +83,18 @@ dataset_df <- data.frame(names, details)
 names(dataset_df) <- c("Detail", "Description")
 
 dataset_table <- kable(dataset_df, caption = "General Information About the Data Used") %>%
-    kable_styling(latex_options = "HOLD_position")
+  column_spec(2, width = "5in") %>%
+  kable_styling(latex_options = "HOLD_position")
 dataset_table
 ```
+
+## Data Wrangling:  
+  
+We began our analysis by selecting the following columns from the raw data CSV files: Year, Wave, Mode, Area, and Total Catch. Next, we created a custom function to convert waves to months in order to process the six annual waves using time series analysis. For NOAA fishing records, wave 1 represents January and February, wave 2 represents March and April, and this continues through the year. Therefore, we assigned wave 1 catches to the date of January 1, wave 2 catches to March 1, and beyond.
+
+After applying the custom wave-to-month function to the data, we created a date variable to capture year and month together (the day value for each of these dates was 01). Next, we used a split-apply-combine approach to find the sum of total catch for each wave. Each of these sums contains the catch from all unique combinations of fishing mode and area that were recorded during a given wave. Finally, to create the time series, we selected only the columns for date (DATE) and the sum of total catch (TOT_CAT_ALL). We computed summary statistics for these total catch values, as shown in Table 2. We then proceeded with exploratory analysis and interpolation of missing data points, which are described below.
+
+
 ```{r wave to month, include=FALSE}
 wave_to_month_function <-  (function(WAVE) {
   if(WAVE == 1) {
@@ -213,7 +217,7 @@ catchsummaries_table
 
 # Exploratory Analysis 
 
-Following initial wrangling, we checked the number of waves without catch records for each dataset by joining the existing data to a list of all possible waves between Wave 1 of 1990 (represented by 1990-01-01) and Wave 6 of 2019 (2019-11-01). The results of this exploration, which informed our approach for interpolation, can be found in Table 3.
+Following initial wrangling, we checked the number of waves without catch records for each dataset by joining the existing data to a list of all possible waves between wave 1 of 1990 (represented by 1990-01-01) and wave 6 of 2019 (represented by 2019-11-01). The results of this exploration, which informed our approach for interpolation, can be found in Table 3.
 
 ```{r table3, echo = FALSE}
 datasets <- c("All fish", "Bluefish", "Black sea bass")
@@ -229,7 +233,7 @@ NA_table
 
 ```
 
-To fill the gaps with no data, we interpolated the likely values of missing time periods. This linear interpolation incorporated the catch numbers on either side chronologically. If Wave 1 of 1990 or wave 6 of 2019 was missing, we did not interpolate the value, as there would not be a measurement available on both sides.  We graphed the total catch trends over time (with the newly interpolated values for missing periods) as shown in Figure 1. With this visualization, we could compare the three categories' recreational fishing catch patterns: all fish, bluefish, and black sea bass. 
+To fill the gaps with no data, we interpolated the likely values of missing time periods. This linear interpolation incorporated the catch numbers on either side chronologically. If wave 1 of 1990 or wave 6 of 2019 was missing, we did not interpolate the value, as there would not be a measurement available on both sides.  We graphed the total catch trends over time (with the newly interpolated values for missing periods) as shown in Figure 1. With this visualization, we could compare the three categories' recreational fishing catch patterns: all fish, bluefish, and black sea bass. 
 
 ```{r ggplot, echo=FALSE, fig.height = 5, fig.width = 6, fig.cap = "Total Catch Patterns over Time"}
 fish_ggplot <- ggplot(fish.summary.interpolate, aes(x = DATE, y = TOT_CAT_ALL)) +
@@ -312,6 +316,8 @@ bass.trend <- Kendall::SeasonalMannKendall(bass.summary.interpolate.ts)
 bass.trend
 
 ```
+  
+We ran a Seasonal Mann-Kendall test on each time series to test whether there was a monotonic trend in the total number of fish caught over time (Table 4). All three tests returned a statistically significant result (All fish: tau = 0.49, p < 2.22 x 10^-16; bluefish: tau = 0.32, p = 8.75 x 10^-10; black sea bass: tau = 0.41, p = 8.44 x 10^-15). Therefore, for all three time series, we reject the null hypothesis that there is no monotonic trend in favor of the alternative hypothesis that there is a trend in the data over time.  
 
 ```{r table4, echo = FALSE}
 fishtrends_df <- data.frame(c("All Fish", fish.trend))
@@ -334,10 +340,7 @@ trends_table <- kable(trends_df, caption = "Seasonal Mann Kendall Tests") %>%
 trends_table
 ```
   
-  
-We ran a Seasonal Mann-Kendall test on each time series to test whether there was a monotonic trend in the total number of fish caught over time (Table 4). All three tests returned a statistically significant result (All fish: tau = 0.49, p < 2.22 x 10^-16; bluefish: tau = 0.32, p = 8.75 x 10^-10; black sea bass: tau = 0.41, p = 8.44 x 10^-15).Therefore, for all three time series, we reject the null hypothesis that there is no monotonic trend in favor of the alternative hypothesis that there is a trend in the data over time.  
-  
-*Note on Table 4: p-values in this table were generated from wrangling the outputs from the seasonal Mann-Kendall tests. This wrangling rounded the p-value for all fish from < 2.22 x 10^-16 to 0.*
+*Note on Table 4: p-values in this table were generated from wrangling the outputs from the seasonal Mann-Kendall tests. This wrangling rounded the p-value for all fish from < 2.22 x 10^-16 to 0.*   
   
 The strengths of these trends vary; based on tau values, catch for all fish has the strongest overall trend while bluefish has the weakest overall trend. Nonetheless, total catch for both individual species and all species combined increases between the beginning of 1990 and the end of 2019.
 
@@ -378,7 +381,7 @@ The Holt-Winters plots (Figure 5) all show clear continued seasonal patterns and
 
 ## Strong seasonal trends
 
-NOAA marine recreational fishing catch totals for North Carolina show strong seasonal trends. Many more fish are caught in the summer, and much fewer fish are caught in the winter, as demonstrated above (Figure 1). This seasonality is likely influenced by recreational fishing patterns, where fishers are more likely to fish in the warm summer weather than the cool winter weather. Another potential cause for the seasonal trends is fish abundance and migration patterns, with higher populations of fish in North Carolina waters during the summer than during the winter. Total catch trends for all fish and black sea bass showed unimodal peaks and valleys overall, while bluefish showed bimodal trends (Figure 1). These bimodal bluefish peaks could be due to their seasonal migration patterns ([ASMFC 2021](http://www.asmfc.org/species/bluefish)). Another possible explanation is that bluefish in the northern Atlantic Ocean spawn twice annually, once in the spring and once in the summer (Arthur & Walford 1979).
+NOAA marine recreational fishing catch totals for North Carolina show strong seasonal trends. Many more fish are caught in the summer, and much fewer fish are caught in the winter, as demonstrated above (Figure 1). This seasonality is likely influenced by recreational fishing patterns, where fishers are more likely to fish in warm summer weather than cool winter weather. Another potential cause for the seasonal trends is fish abundance and migration patterns, with higher populations of fish in North Carolina waters during the summer than during the winter. Total catch trends for all fish and black sea bass showed unimodal peaks and valleys overall, while bluefish showed bimodal trends (Figure 1). These bimodal bluefish peaks could be due to their seasonal migration patterns ([ASMFC 2021](http://www.asmfc.org/species/bluefish)). Another possible explanation for their bimodal trends is that bluefish in the northern Atlantic Ocean spawn twice annually, once in the spring and once in the summer (Arthur & Walford 1979).
 
 <br />
 
@@ -388,7 +391,7 @@ There was an increase in total catch of bluefish, black sea bass, and all specie
 
   ##I think it would be beneficial to add some references in this section – working on this! - Annie  
 
-Although the trend was generally positive for all three time series, it was not uniform; in other words, the rate of change varied over time, and there were brief periods where catch plateaued or decreased. This variation could be caused by changes in recreational fishing regulations over time, such as the increase or decrease of catch limits and size limits, or temporary area closures. Furthermore, recreational fishing is subject to all of the myriad factors that can influence human behavior, including but not limited to climate variation (Dundas & von Haefen 2020) and events with an environmental impact (such as hurricanes, e.g. Smee et al. 2020, or the Deepwater Horizon Oil Spill, e.g. Alvarez et al. 2014). In a recent example of how other current events could impact recreational fishing that is beyond the scope of our analysis, which extended only to the end of 2019, the COVID-19 pandemic could have either increased recreational fishing in 2020, when people were spending more time outside, or decreased recreational fishing, as people were less able to travel to the coast.
+Although the trend was generally positive for all three time series, it was not uniform; in other words, the rate of change varied over time, and there were brief periods where catch plateaued or decreased. This variation could be caused by changes in recreational fishing regulations over time, such as the increase or decrease of catch limits and size limits, or temporary area closures. Furthermore, recreational fishing is subject to the myriad of factors that can influence human behavior, including but not limited to climate variation (Dundas & von Haefen 2020) and events with an environmental impact such as hurricanes (Smee et al. 2020) or the Deepwater Horizon Oil Spill (Alvarez et al. 2014). In a recent example of how other current events could impact recreational fishing that is beyond the scope of our analysis extending only to the end of 2019, the COVID-19 pandemic could have either increased recreational fishing in 2020, when people were spending more time outside, or decreased recreational fishing, as people were less able to travel to the coast.
 
 
 <br />
@@ -406,25 +409,23 @@ Finally, our forecasted data are much cleaner and less noisy than our existing d
 
 ## Future recommendations
 
+Future research could extend our analysis to include a greater scope regarding specific species, areas, and timelines. NOAA provides catch data for an extensive number of fish species, and therefore time-series and forecasting analysis could also be applied to other species of interest. Likewise, the widespread area available for NOAA catch data means that future research could translate our analysis toward catch numbers from other states. Additionally, the available data goes beyond the timeline we analyzed, dating back to 1981. Future analysis could adjust variables of interest accordingly thanks to the vast NOAA data available for public access. 
 
-+ Comparisons of other species or other states
-+ Catch per unit effort
-+ Include earlier data
+In addition to adjusting the sample for analysis, future research could compare changes of catch per unit of effort over time. Analyzing total catch does not incorporate the number of fishers or success rates. Incorporating the catch per unit of effort could reveal possible causes of the increasing catch trends over time (e.g. more fishers in total or more efficient fishers).
 
 
 \newpage
 
 # References
-<add references here if relevant, otherwise delete this section> 
 
 Alvarez, S., Larkin, S. L., Whitehead, J. C., & Haab, T. (2014). A revealed preference approach to valuing non-market recreational fishing losses from the Deepwater Horizon oil spill. *Journal of Environmental Management*, 145, 199-209.
 
 Arthur W. K., & Walford, L. A. (1979). Sources and distribution of bluefish, Pomatomus saltatrix, larvae and juveniles off the east coast of the United States. *Fishery Bulletin*, 77(1), 213.
 
+Atlantic States Marine Fisheries Commission. (2021). "Bluefish." Retrieved from: http://www.asmfc.org/species/bluefish, accessed 25 Apr 2021.
+
 Dundas, S. J., & von Haefen, R. H. (2020). The effects of weather on recreational fishing demand and adaptation: Implications for a changing climate. *Journal of the Association of Environmental and Resource Economists*, 7(2), 209-242.
 
 National Oceanic and Atmospheric Administration. (n.d.). "About the Marine Recreational Information Program". Retrieved from: https://www.fisheries.noaa.gov/recreational-fishing-data/about-marine-recreational-information-program, accessed 25 Apr 2021.
-
-http://www.asmfc.org/species/bluefish
 
 Smee, D. L., Reustle, J. W., Belgrad, B. A., & Pettis, E. L. (2020). Storms promote ecosystem resilience by alleviating fishing. *Current Biology*, 30(15), R869-R870.
