@@ -326,7 +326,7 @@ bass.trend
 
 ```
   
-We ran a Seasonal Mann-Kendall test on each time series to test whether there was a monotonic trend in the total number of fish caught over time (Table 4). All three tests returned a statistically significant result (All fish: tau = 0.49, p < 2.22 x 10^-16; bluefish: tau = 0.32, p = 8.75 x 10^-10; black sea bass: tau = 0.41, p = 8.44 x 10^-15). Therefore, for all three time series, we reject the null hypothesis that there is no monotonic trend in favor of the alternative hypothesis that there is a trend in the data over time.  
+We ran a Seasonal Mann-Kendall test on each time series to test whether there was a monotonic trend in the total number of fish caught over time (Table 4). All three tests returned a statistically significant result (all fish: tau = 0.49, p < 2.22 x 10^-16; bluefish: tau = 0.32, p = 8.75 x 10^-10; black sea bass: tau = 0.41, p = 8.44 x 10^-15). Therefore, for all three time series, we reject the null hypothesis that there is no monotonic trend in favor of the alternative hypothesis that there is a trend in the data over time.  
 
 ```{r table4, echo = FALSE}
 fishtrends_df <- data.frame(c("All Fish", fish.trend))
@@ -405,16 +405,16 @@ Although the trend was generally positive for all three time series, it was not 
 
 The MRIP system works very well for its intended purposes, but it is ultimately still a system based on estimation. Through MRIP, NOAA interviews only some fishers, then uses mathematical modeling to extrapolate on this collected survey data in order to create statewide (or area-wide, depending on the dataset) estimates. While MRIP is the best source of recreational fishing catch data, there is always room for some error in its estimations. 
 
-Within each of our datasets, there were some missing values. These values were not side by side or frequent, so we chose to linearly interpolate our data in order to fill them in. This helped our figures and analyses (e.g. seasonal Mann-Kendall) to appear and run cleaner, but interpolating has some drawbacks. While interpolations seemed to follow the clear seasonal pattern in each dataset, most often the interpolated data was in wave periods that were minimums in other years of the datasets, so our interpolated values may have been a bit higher than actual catch rates during those times. Interpolation is an estimator for missing data, and it is important to acknowledge that our interpolated data may not be representative of true values.  
+Within each of our datasets, there were some missing values. These values were not side by side or frequent, so we chose to linearly interpolate our data in order to fill them in. This helped our figures and analyses (e.g. seasonal Mann-Kendall) to appear and run cleaner, but interpolating has some drawbacks. While interpolations seemed to follow the clear seasonal pattern in each dataset, most often the interpolated data was in wave periods that were minimums in other years, so our interpolated values may have been a bit higher than actual catch rates during those times. Interpolation is an estimator for missing data, and it is important to acknowledge that our interpolated data may not be representative of true values.  
 
-Finally, our forecasted data are much cleaner and less noisy than our existing data (see Figure 5). Noise in these datasets comes from external factors like changes in fish catch limits or weather patterns, which this forecasting method can neither take into account nor predict. Our forecasting outputs are therefore limited by the relatively simple methodology we chose to employ. Holt-Winters remains a popular forecasting method and is reasonable to use for our purposes here, but the inherent uncertainty in this predicted data is also important to acknowledge. 
+Finally, our forecasted data was much cleaner and less noisy than our existing data (see Figure 5). Noise in these datasets comes from external factors like changes in fish catch limits or weather patterns, which this forecasting method can neither take into account nor predict. Our forecasting outputs were therefore limited by the relatively simple methodology we chose to employ. Holt-Winters remains a popular forecasting method and is reasonable to use for our purposes here, but the inherent uncertainty in this predicted data is also important to acknowledge. 
 
 
 <br />
 
 ## Future recommendations
 
-Future research could extend our analysis to include a greater scope regarding specific species, areas, and timelines. NOAA provides catch data for an extensive number of fish species, and therefore time-series and forecasting analyses could also be applied to other species of interest. Likewise, the widespread area available for NOAA catch data means that future research could translate our analysis toward catch numbers from other states. Additionally, the available data goes beyond the timeline we analyzed, dating back to 1981. Future analysis could adjust variables of interest accordingly thanks to the vast NOAA data available for public access. 
+Future research could extend our analysis to include a greater scope regarding specific species, areas, and timelines. NOAA provides catch data for an extensive number of fish species, and therefore time-series and forecasting analyses could also be applied to other species of interest. Likewise, the widespread area available for NOAA catch data means that future research could translate our analysis toward catch numbers from other states. Additionally, the available data goes beyond the timeline we analyzed, dating back to 1981. Future analysis could adjust variables of interest accordingly thanks to the vast [NOAA data available for public access](https://www.fisheries.noaa.gov/data-tools/recreational-fisheries-statistics-queries). 
 
 In addition to adjusting the sample for analysis, future research could compare changes of catch per unit of effort over time. Analyzing total catch does not incorporate the number of fishers or success rates. Incorporating the catch per unit of effort could reveal possible causes of the increasing catch trends over time (e.g. more fishers in total or more efficient fishers).
 
@@ -432,5 +432,7 @@ Atlantic States Marine Fisheries Commission. (2021). "Bluefish." Retrieved from:
 Dundas, S. J., & von Haefen, R. H. (2020). The effects of weather on recreational fishing demand and adaptation: Implications for a changing climate. *Journal of the Association of Environmental and Resource Economists*, 7(2), 209-242.
 
 National Oceanic and Atmospheric Administration. (n.d.). "About the Marine Recreational Information Program". Retrieved from: https://www.fisheries.noaa.gov/recreational-fishing-data/about-marine-recreational-information-program, accessed 25 Apr 2021.
+
+National Oceanic and Atmospheric Administration. (n.d.). "Recreational Fishing Statistics Queries." Retrieved from: https://www.fisheries.noaa.gov/data-tools/recreational-fisheries-statistics-queries, accessed 18 Apr 2021.
 
 Smee, D. L., Reustle, J. W., Belgrad, B. A., & Pettis, E. L. (2020). Storms promote ecosystem resilience by alleviating fishing. *Current Biology*, 30(15), R869-R870.
