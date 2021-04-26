@@ -388,7 +388,7 @@ There was an increase in total catch of bluefish, black sea bass, and all specie
 
   ##I think it would be beneficial to add some references in this section – working on this! - Annie  
 
-Although the trend was generally positive for all three time series, it was not uniform; in other words, the rate of change varied over time, and there were brief periods where catch plateaued or decreased. This variation could be caused by changes in recreational fishing regulations over time, such as the increase or decrease of catch limits and size limits, or temporary area closures. Furthermore, recreational fishing is subject to all of the myriad factors that can influence human behavior, including but not limited to climate variation and current events. In a recent example of how current events could impact recreational fishing that is beyond the scope of our analysis, which extended only to the end of 2019, the COVID-19 pandemic could have either increased recreational fishing in 2020, when people were spending more time outside, or decreased recreational fishing, as people were less able to travel to the coast.
+Although the trend was generally positive for all three time series, it was not uniform; in other words, the rate of change varied over time, and there were brief periods where catch plateaued or decreased. This variation could be caused by changes in recreational fishing regulations over time, such as the increase or decrease of catch limits and size limits, or temporary area closures. Furthermore, recreational fishing is subject to all of the myriad factors that can influence human behavior, including but not limited to climate variation (Dundas & von Haefen 2020) and events with an environmental impact (such as hurricanes, e.g. Smee et al. 2020, or the Deepwater Horizon Oil Spill, e.g. Alvarez et al. 2014). In a recent example of how other current events could impact recreational fishing that is beyond the scope of our analysis, which extended only to the end of 2019, the COVID-19 pandemic could have either increased recreational fishing in 2020, when people were spending more time outside, or decreased recreational fishing, as people were less able to travel to the coast.
 
 
 <br />
@@ -397,7 +397,7 @@ Although the trend was generally positive for all three time series, it was not 
 
 The MRIP system works very well for its intended purposes, but it is ultimately still a system based on estimation. Through MRIP, NOAA interviews only some fishers, then uses mathematical modeling to extrapolate on this collected survey data in order to create statewide (or area-wide, depending on the dataset) estimates. While MRIP is the best source of recreational fishing catch data, there is always room for some error in its estimations. 
 
-Within each of our datasets, there were some missing values. These values were not side by side or frequent, so we chose to linearly interpolate our data in order to fill them in. This helped our figures and analyses (e.g. Mann-Kendall) to appear and run cleaner, but interpolating has some drawbacks. While interpolations seemed to follow the clear seasonal pattern in each dataset, most often the interpolated data was in wave periods that were minimums in other years of the datasets, so our interpolated values may have been a bit higher than actual catch rates during those times. Interpolation is an estimator for missing data, and it is important to acknowledge that our interpolated data may not be representative of true values.  
+Within each of our datasets, there were some missing values. These values were not side by side or frequent, so we chose to linearly interpolate our data in order to fill them in. This helped our figures and analyses (e.g. seasonal Mann-Kendall) to appear and run cleaner, but interpolating has some drawbacks. While interpolations seemed to follow the clear seasonal pattern in each dataset, most often the interpolated data was in wave periods that were minimums in other years of the datasets, so our interpolated values may have been a bit higher than actual catch rates during those times. Interpolation is an estimator for missing data, and it is important to acknowledge that our interpolated data may not be representative of true values.  
 
 Finally, our forecasted data are much cleaner and less noisy than our existing data. Noise in these datasets comes from external factors like changes in fish catch limits or weather patterns, which this forecasting method can neither take into account nor predict. Our forecasting outputs are therefore limited by the relatively simple methodology we chose to employ. Holt-Winters remains a popular forecasting method and is reasonable to use for our purposes here, but the inherent uncertainty in this predicted data is important to acknowledge. 
 
@@ -417,8 +417,14 @@ Finally, our forecasted data are much cleaner and less noisy than our existing d
 # References
 <add references here if relevant, otherwise delete this section> 
 
+Alvarez, S., Larkin, S. L., Whitehead, J. C., & Haab, T. (2014). A revealed preference approach to valuing non-market recreational fishing losses from the Deepwater Horizon oil spill. *Journal of Environmental Management*, 145, 199-209.
+
+Arthur W. K., & Walford, L. A. (1979). Sources and distribution of bluefish, Pomatomus saltatrix, larvae and juveniles off the east coast of the United States. *Fishery Bulletin*, 77(1), 213.
+
+Dundas, S. J., & von Haefen, R. H. (2020). The effects of weather on recreational fishing demand and adaptation: Implications for a changing climate. *Journal of the Association of Environmental and Resource Economists*, 7(2), 209-242.
+
 National Oceanic and Atmospheric Administration. (n.d.). "About the Marine Recreational Information Program". Retrieved from: https://www.fisheries.noaa.gov/recreational-fishing-data/about-marine-recreational-information-program, accessed 25 Apr 2021.
 
 http://www.asmfc.org/species/bluefish
 
-Arthur W. K. & Walford, L. A. (1979). Sources and distribution of bluefish, Pomatomus saltatrix, larvae and juveniles off the east coast of the United States. *Fishery Bulletin*, 77(1), 213.
+Smee, D. L., Reustle, J. W., Belgrad, B. A., & Pettis, E. L. (2020). Storms promote ecosystem resilience by alleviating fishing. *Current Biology*, 30(15), R869-R870.
