@@ -270,6 +270,8 @@ plot_grid(fish_ggplot, blue_ggplot, bass_ggplot, nrow = 3)
 
 After our exploratory analysis and interpolation of the missing data points for each dataset, we created three time series for further analysis. We investigated the trends in total catch for all fish (Figure 2), bluefish (Figure 3), and black sea bass (Figure 4) by decomposing the time series into their seasonal, trend, and remainder components. For all three time series, we observed a strong seasonal trend with low catch totals in the winter and high catch totals in the summer. Furthermore, each trend component showed an apparent increase in total catch over time.  
 
+Though all three datasets show an increasing trend over time, the magnitude of this increase varies. The trend component of the time series has a range of 12,667,496 for all fish, 2,237,223.2 for bluefish, and 1,115,112.3 for black sea bass. The IQR for the trend component of the time series was 5,528,819 for all fish, 976,185 for bluefish, and 245,287 for black sea bass.
+
 
 
 ```{r All Fish Trends, echo=FALSE, fig.height = 4, fig.cap = 'Seasonal and Trend Decomposition for All Fish Total Catch'}
@@ -282,6 +284,7 @@ fish.summary.ts.decomp <- stl(fish.summary.interpolate.ts, s.window = "periodic"
 plot(fish.summary.ts.decomp)
 
 ```
+
 
 ```{r Bluefish Trends, echo=FALSE, fig.height = 4, fig.cap = 'Seasonal and Trend Decomposition for Bluefish Total Catch'}
 blue.fmonth <- month(first(blue.summary.interpolate$DATE))
@@ -303,6 +306,12 @@ bass.summary.interpolate.ts <- ts(bass.summary.interpolate$TOT_CAT_ALL,
 bass.summary.ts.decomp <- stl(bass.summary.interpolate.ts, s.window = "periodic")
 plot(bass.summary.ts.decomp)
 
+```
+
+```{r Summaries of components for all 3 ts (hidden), eval=FALSE, include=FALSE}
+summary(fish.summary.ts.decomp)
+summary(blue.summary.ts.decomp)
+summary(bass.summary.ts.decomp)
 ```
 
 ```{r Trends, include=FALSE}
